@@ -9,7 +9,9 @@ import live.smoothing.sensordata.repository.KwhRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
 import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
 import java.util.List;
 
 import static com.influxdb.query.dsl.functions.restriction.Restrictions.*;
@@ -19,6 +21,7 @@ import static com.influxdb.query.dsl.functions.restriction.Restrictions.*;
 public class KwhRepositoryImpl implements KwhRepository {
 
     private final InfluxDBConfig client;
+
     private static final String AGGREGATION_BUCKET = "aggregation";
     private static final String AGGREGATION2_BUCKET = "aggregation2";
     private static final String RAW_BUCKET = "raw";
@@ -27,9 +30,10 @@ public class KwhRepositoryImpl implements KwhRepository {
     private static final String COLUMN_VALUE = "_value";
 
     @Override
-    public List<Kwh> get24HourData() {
+    public List<Kwh> get24HourData(Long start, ChronoUnit chronoUnit) {
+
         Flux query = Flux.from(AGGREGATION_BUCKET)
-                .range(-1L, ChronoUnit.DAYS)
+                .range(start, chronoUnit)
                 .filter(measurement().equal("kwh_hour"))
                 .last()
                 .pivot()
@@ -45,7 +49,7 @@ public class KwhRepositoryImpl implements KwhRepository {
     }
 
     @Override
-    public List<Kwh> getWeekData() {
+    public List<Kwh> getWeekData(Long start, ChronoUnit chronoUnit) {
         Flux query = Flux.from(AGGREGATION2_BUCKET)
                 .range(-7L, ChronoUnit.DAYS)
                 .filter(measurement().equal("kwh_hour"))
@@ -79,5 +83,4 @@ public class KwhRepositoryImpl implements KwhRepository {
             return influxDBClient.getQueryApi().query(query.toString(), Kwh.class);
         }
     }
-
 }

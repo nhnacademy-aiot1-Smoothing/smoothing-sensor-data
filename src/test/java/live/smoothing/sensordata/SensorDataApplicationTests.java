@@ -29,7 +29,7 @@ class SensorDataApplicationTests {
     @Test
     void 시24간데이터() {
         KwhRepositoryImpl kwhRepository = new KwhRepositoryImpl(client);
-        System.out.println("Data: " + kwhRepository.get24HourData().get(0).getPlace());
+        System.out.println("Data: " + kwhRepository.get24HourData(-1L, ChronoUnit.DAYS).get(0).getPlace());
     }
 
 }
