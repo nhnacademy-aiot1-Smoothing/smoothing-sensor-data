@@ -21,8 +21,7 @@ public class InfluxDBConfig {
                 .create(
                         aggregationInfluxDBProperties.getUrl(),
                         aggregationInfluxDBProperties.getToken().toCharArray(),
-                        aggregationInfluxDBProperties.getOrg(),
-                        aggregationInfluxDBProperties.getBucket()
+                        aggregationInfluxDBProperties.getOrg()
                 );
     }
 
@@ -32,8 +31,7 @@ public class InfluxDBConfig {
                 .create(
                         rawInfluxDBProperties.getUrl(),
                         rawInfluxDBProperties.getToken().toCharArray(),
-                        rawInfluxDBProperties.getOrg(),
-                        rawInfluxDBProperties.getBucket()
+                        rawInfluxDBProperties.getOrg()
                 );
     }
 }
