@@ -53,6 +53,12 @@
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
         </dependency>
+
+        <dependency>
+            <groupId>com.github.nhnacademy-aiot1-Smoothing</groupId>
+            <artifactId>smoothing-common</artifactId>
+            <version>1.2.1</version>
+        </dependency>
     </dependencies>
 
     <dependencyManagement>
@@ -66,6 +72,13 @@
             </dependency>
         </dependencies>
     </dependencyManagement>
+
+    <repositories>
+        <repository>
+            <id>jitpack.io</id>
+            <url>https://jitpack.io</url>
+        </repository>
+    </repositories>
 
     <build>
         <plugins>
