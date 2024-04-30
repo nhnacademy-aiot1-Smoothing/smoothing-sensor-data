@@ -1,6 +1,7 @@
 package live.smoothing.sensordata.util;
 
 import java.time.Instant;
+import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
 
@@ -23,5 +24,9 @@ public class TimeUtil {
 
         return source.truncatedTo(ChronoUnit.HOURS)
                 .plus(truncatedMinute, ChronoUnit.MINUTES);
+    }
+
+    public static int getMonth(LocalDateTime localDateTime) {
+        return localDateTime.getMonthValue();
     }
 }

@@ -1,6 +1,6 @@
 package live.smoothing.sensordata.service;
 
-import live.smoothing.sensordata.dto.PowerMetricResponse;
+import live.smoothing.sensordata.dto.watt.PowerMetricResponse;
 
 public interface WattService {
 
