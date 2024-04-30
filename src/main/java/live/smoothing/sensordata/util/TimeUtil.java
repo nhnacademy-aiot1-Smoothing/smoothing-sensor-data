@@ -24,9 +24,4 @@ public class TimeUtil {
         return source.truncatedTo(ChronoUnit.HOURS)
                 .plus(truncatedMinute, ChronoUnit.MINUTES);
     }
-
-    public static void main(String[] args) {
-        System.out.println(getRecentHour(Instant.now(), 1));
-        System.out.println(getRecentMinute(Instant.now(), 10));
-    }
 }
