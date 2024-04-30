@@ -5,6 +5,11 @@ import lombok.Setter;
 
 import java.time.Instant;
 
+/**
+ * Kwh DTO
+ *
+ * @author 신민석
+ */
 @Getter
 @Setter
 public class Kwh {
