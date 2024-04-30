@@ -18,12 +18,13 @@ public class FluxUtil {
 
     public static Flux getFlux(String bucketName,
                                String measurementName,
-                               Instant start) {
-
+                               Instant start,
+                               String[] topics
+    ) {
         return Flux.from(bucketName)
                 .range(start)
                 .filter(measurement().equal(measurementName))
-//                .last()
+//                .filter(Restrictions.tag("topic").contains(topics))
                 .pivot()
                 .withRowKey(new String[]{ROW_KEY})
                 .withColumnKey(new String[]{COLUMN_KEY})

@@ -11,46 +11,57 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
 
+// TODO: topicAdapter
+// TODO: Tag 받아서 파싱.
+
 @Service
 @RequiredArgsConstructor
 public class KwhServiceImpl implements KwhService {
 
     private final KwhRepository kwhRepository;
+    private final String[] testTopics = {"V"};
 
     @Override
-    public PowerMetricResponse get24HourData() {
+    public PowerMetricResponse get24HourData(String type, String unit, String per, String tags) {
 
-        List<Kwh> kwhList = kwhRepository.get24HourData();
+        List<Kwh> kwhList = kwhRepository.get24HourData(testTopics);
         List<PowerMetric> metricList = new ArrayList<>();
 
-        for(int i = 0; i < kwhList.size(); i++) {
-            if(kwhList.get(i+1) != null) {
-                double useAge = kwhList.get(i+1).getValue() - kwhList.get(i).getValue();
-
-                PowerMetric powerMetric =
-                        new PowerMetric(
-                                "kwh",
-                                "hour",
-                                "1",
-                                kwhList.get(i).getTime(),
-                                useAge
-                                );
-
+        for(int i = 0; i < kwhList.size() - 1; i++) {
+            if(kwhList.get(i + 1) != null) {
+                PowerMetric powerMetric = new PowerMetric("kwh", "hour", "1", kwhList.get(i).getTime(), getGap(kwhList));
                 metricList.add(powerMetric);
             }
         }
-        List<Kwh> rawList = kwhRepository.get24Raw();
-        double lastValue = rawList.getLast().getValue();
-        double firstValue = rawList.getFirst().getValue();
+        List<Kwh> rawList = kwhRepository.get24Raw(testTopics);
 
-        PowerMetric powerMetric =
-                new PowerMetric(
-                        "kwh",
-                        "hour",
-                        "1",
-                        rawList.getFirst().getTime(),
-                        lastValue - firstValue);
+        PowerMetric powerMetric = new PowerMetric("kwh", "hour", "1", rawList.get(0).getTime(), getGap(rawList));
         metricList.add(powerMetric);
-        return new PowerMetricResponse(List.of("kwh"), metricList);
+        return new PowerMetricResponse(List.of(tags), metricList);
     }
+
+    @Override
+    public PowerMetricResponse getWeekData(String type, String unit, String per, String tags) {
+
+        List<Kwh> list = kwhRepository.getWeekData(testTopics);
+        List<PowerMetric> metricList = new ArrayList<>();
+
+        for(int i=0; i < list.size()-1; i++) {
+            if(list.get(i + 1) != null) {
+                PowerMetric powerMetric = new PowerMetric("kwh", "day", "1", list.get(i).getTime(), getGap(list));
+                metricList.add(powerMetric);
+            }
+        }
+        List<Kwh> rawList = kwhRepository.getWeekRaw(testTopics);
+        PowerMetric powerMetric = new PowerMetric("kwh", "day", "1", rawList.get(0).getTime(), getGap(rawList));
+        metricList.add(powerMetric);
+
+        return new PowerMetricResponse(List.of(tags), metricList);
+    }
+
+
+    private double getGap(List<Kwh> list) {
+        return list.get(list.size() - 1).getValue() - list.get(0).getValue();
+    }
+
 }

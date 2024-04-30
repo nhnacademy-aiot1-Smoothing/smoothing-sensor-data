@@ -5,6 +5,7 @@ import com.influxdb.query.dsl.Flux;
 import live.smoothing.sensordata.config.InfluxDBConfig;
 import live.smoothing.sensordata.dto.Kwh;
 import live.smoothing.sensordata.repository.KwhRepository;
+import live.smoothing.sensordata.util.TimeUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -24,12 +25,13 @@ public class KwhRepositoryImpl implements KwhRepository {
     private static final String RAW_BUCKET = "powermetrics_data";
 
     @Override
-    public List<Kwh> get24HourData() {
+    public List<Kwh> get24HourData(String[] topics) {
         Flux query =
                 getFlux(
                         AGGREGATION_BUCKET,
                         "kwh_hour",
-                        Instant.now().minus(1, ChronoUnit.DAYS)
+                        Instant.now().minus(1, ChronoUnit.DAYS),
+                        topics
                 );
 
         try(InfluxDBClient influxDBClient = client.aggregationInfluxClient()) {
@@ -38,12 +40,13 @@ public class KwhRepositoryImpl implements KwhRepository {
     }
 
     @Override
-    public List<Kwh> getWeekData() {
+    public List<Kwh> getWeekData(String[] topics) {
         Flux query =
                 getFlux(
                         AGGREGATION2_BUCKET,
                         "kwh_daily",
-                        Instant.now()
+                        Instant.now(),
+                        topics
                 );
 
         try(InfluxDBClient influxDBClient = client.aggregationInfluxClient()) {
@@ -53,13 +56,14 @@ public class KwhRepositoryImpl implements KwhRepository {
     }
 
     @Override
-    public List<Kwh> get24Raw() {
+    public List<Kwh> get24Raw(String[] topics) {
 
         Flux query =
                 getFlux(
                         RAW_BUCKET,
                         "mqtt_consumer",
-                        Instant.now().minus(1L, ChronoUnit.HOURS)
+                        TimeUtil.getRecentHour(Instant.now(), 1),
+                        topics
                 );
 
         try(InfluxDBClient influxDBClient = client.rawInfluxClient()) {
@@ -68,13 +72,14 @@ public class KwhRepositoryImpl implements KwhRepository {
     }
 
     @Override
-    public List<Kwh> getWeekRaw(String measurementName) {
+    public List<Kwh> getWeekRaw(String[] topics) {
 
         Flux query =
                 getFlux(
                         AGGREGATION2_BUCKET,
-                        measurementName,
-                        Instant.now().minus(1L, ChronoUnit.DAYS)
+                        "kwh_daily",
+                        Instant.now().minus(1L, ChronoUnit.DAYS),
+                        topics
                 );
 
         try(InfluxDBClient influxDBClient = client.rawInfluxClient()) {
