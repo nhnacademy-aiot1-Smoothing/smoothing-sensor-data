@@ -13,7 +13,11 @@ import java.util.List;
 
 // TODO: topicAdapter
 // TODO: Tag 받아서 파싱.
-
+/**
+ * 전력관련 서비스 구현체
+ *
+ * @author 신민석
+ */
 @Service
 @RequiredArgsConstructor
 public class KwhServiceImpl implements KwhService {
@@ -21,6 +25,15 @@ public class KwhServiceImpl implements KwhService {
     private final KwhRepository kwhRepository;
     private final String[] testTopics = {"V"};
 
+    /**
+     * 24시간 동안의 데이터를 조회하여 반환
+     *
+     * @param type 조회할 데이터의 타입
+     * @param unit 조회할 데이터의 단위
+     * @param per 조회할 데이터의 주기
+     * @param tags 조회할 데이터의 태그
+     * @return PowerMetricResponse
+     */
     @Override
     public PowerMetricResponse get24HourData(String type, String unit, String per, String tags) {
 
@@ -40,6 +53,15 @@ public class KwhServiceImpl implements KwhService {
         return new PowerMetricResponse(List.of(tags), metricList);
     }
 
+    /**
+     * 7일 동안의 데이터를 조회하여 반환
+     *
+     * @param type 조회할 데이터의 타입
+     * @param unit 조회할 데이터의 단위
+     * @param per 조회할 데이터의 주기
+     * @param tags 조회할 데이터의 태그
+     * @return PowerMetricResponse
+     */
     @Override
     public PowerMetricResponse getWeekData(String type, String unit, String per, String tags) {
 
@@ -60,6 +82,11 @@ public class KwhServiceImpl implements KwhService {
     }
 
 
+    /**
+     * Kwh 리스트의 처음과 끝의 값을 빼서 차이를 반환
+     * @param list 처음과 끝의 차이를 구할 Kwh 리스트
+     * @return 처음과 끝의 차이
+     */
     private double getGap(List<Kwh> list) {
         return list.get(list.size() - 1).getValue() - list.get(0).getValue();
     }
