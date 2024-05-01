@@ -14,6 +14,6 @@ import java.time.LocalDateTime;
 public class GoalHistoryResponse {
 
     private LocalDateTime date;
-    private Long goalAmount;
-    private Long amount;
+    private Double goalAmount;
+    private Double amount;
 }

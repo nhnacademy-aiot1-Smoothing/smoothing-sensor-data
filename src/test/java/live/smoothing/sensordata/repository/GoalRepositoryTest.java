@@ -25,19 +25,19 @@ class GoalRepositoryTest {
         // 2021-01-01 년도를 LocalDateTime으로 생성
         Goal firstGoal = Goal.builder()
                 .goalDate(LocalDateTime.of(LocalDate.of(2021, 3, 1), LocalDateTime.MIN.toLocalTime()))
-                .goalAmount(3000L)
+                .goalAmount(3000.0)
                 .unitPrice(300)
                 .build();
 
         Goal secondGoal = Goal.builder()
                 .goalDate(LocalDateTime.of(LocalDate.of(2021, 2, 1), LocalDateTime.MIN.toLocalTime()))
-                .goalAmount(2000L)
+                .goalAmount(2000.0)
                 .unitPrice(200)
                 .build();
 
         Goal thirdGoal = Goal.builder()
                 .goalDate(LocalDateTime.of(LocalDate.of(2021, 1, 1), LocalDateTime.MIN.toLocalTime()))
-                .goalAmount(1000L)
+                .goalAmount(1000.2)
                 .unitPrice(100)
                 .build();
 

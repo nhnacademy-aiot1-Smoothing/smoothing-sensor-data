@@ -24,10 +24,10 @@ public class Goal {
 
 
     @Column(name = "goal_amount")
-    private Long goalAmount;
+    private Double goalAmount;
 
     @Column(name = "amount")
-    private Long amount;
+    private Double amount;
 
     @Column(name = "unit_price")
     private Integer unitPrice;
