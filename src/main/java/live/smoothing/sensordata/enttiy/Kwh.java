@@ -1,4 +1,4 @@
-package live.smoothing.sensordata.dto;
+package live.smoothing.sensordata.enttiy;
 
 import lombok.Getter;
 import lombok.Setter;

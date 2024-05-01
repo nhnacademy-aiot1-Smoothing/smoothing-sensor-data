@@ -26,6 +26,9 @@ public class Goal {
     @Column(name = "goal_amount")
     private Long goalAmount;
 
+    @Column(name = "amount")
+    private Long amount;
+
     @Column(name = "unitPrice")
     private Integer unitPrice;
 }

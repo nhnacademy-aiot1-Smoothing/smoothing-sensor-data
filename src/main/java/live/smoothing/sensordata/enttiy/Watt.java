@@ -1,4 +1,4 @@
-package live.smoothing.sensordata.dto.watt;
+package live.smoothing.sensordata.enttiy;
 
 import com.influxdb.annotations.Column;
 import com.influxdb.annotations.Measurement;
