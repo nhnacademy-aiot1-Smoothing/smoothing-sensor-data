@@ -1,7 +1,7 @@
 package live.smoothing.sensordata.service.impl;
 
 import live.smoothing.sensordata.config.InfluxDBConfig;
-import live.smoothing.sensordata.enttiy.Kwh;
+import live.smoothing.sensordata.entity.Kwh;
 import live.smoothing.sensordata.repository.impl.KwhRepositoryImpl;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

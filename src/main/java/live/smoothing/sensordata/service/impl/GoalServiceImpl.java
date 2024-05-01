@@ -3,7 +3,7 @@ package live.smoothing.sensordata.service.impl;
 import live.smoothing.sensordata.dto.goal.GoalHistoryResponse;
 import live.smoothing.sensordata.dto.goal.GoalRequest;
 import live.smoothing.sensordata.dto.goal.GoalResponse;
-import live.smoothing.sensordata.enttiy.Goal;
+import live.smoothing.sensordata.entity.Goal;
 import live.smoothing.sensordata.repository.GoalRepository;
 import live.smoothing.sensordata.service.GoalService;
 import live.smoothing.sensordata.util.TimeProvider;

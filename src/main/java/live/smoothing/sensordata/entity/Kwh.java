@@ -1,4 +1,4 @@
-package live.smoothing.sensordata.enttiy;
+package live.smoothing.sensordata.entity;
 
 import lombok.Getter;
 import lombok.Setter;

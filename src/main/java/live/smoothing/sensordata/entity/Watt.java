@@ -1,4 +1,4 @@
-package live.smoothing.sensordata.enttiy;
+package live.smoothing.sensordata.entity;
 
 import com.influxdb.annotations.Column;
 import com.influxdb.annotations.Measurement;

@@ -1,6 +1,6 @@
 package live.smoothing.sensordata.repository;
 
-import live.smoothing.sensordata.enttiy.Watt;
+import live.smoothing.sensordata.entity.Watt;
 
 import java.time.Instant;
 import java.util.List;

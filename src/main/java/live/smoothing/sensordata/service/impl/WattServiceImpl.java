@@ -3,7 +3,7 @@ package live.smoothing.sensordata.service.impl;
 import live.smoothing.sensordata.adapter.TopicAdapter;
 import live.smoothing.sensordata.dto.watt.PowerMetric;
 import live.smoothing.sensordata.dto.watt.PowerMetricResponse;
-import live.smoothing.sensordata.enttiy.Watt;
+import live.smoothing.sensordata.entity.Watt;
 import live.smoothing.sensordata.repository.WattRepository;
 import live.smoothing.sensordata.service.WattService;
 import live.smoothing.sensordata.util.TimeUtil;
