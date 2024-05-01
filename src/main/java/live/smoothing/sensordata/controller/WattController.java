@@ -1,15 +1,15 @@
 package live.smoothing.sensordata.controller;
 
 import live.smoothing.common.exception.CommonException;
-import live.smoothing.sensordata.dto.PowerMetricResponse;
+import live.smoothing.sensordata.dto.watt.PowerMetricResponse;
 import live.smoothing.sensordata.service.WattService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
-@Controller
+@RestController
 @RequiredArgsConstructor
 public class WattController {
 
