@@ -2,8 +2,6 @@ package live.smoothing.sensordata.service.impl;
 
 import live.smoothing.sensordata.config.InfluxDBConfig;
 import live.smoothing.sensordata.dto.Kwh;
-import live.smoothing.sensordata.dto.watt.PowerMetric;
-import live.smoothing.sensordata.dto.watt.PowerMetricResponse;
 import live.smoothing.sensordata.repository.impl.KwhRepositoryImpl;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -20,26 +18,6 @@ class KwhServiceImplTest {
     private final String[] testTopic = {"office"};
     @Autowired
     private InfluxDBConfig client;
-
-    @Test
-    void get24HourData() {
-
-        KwhRepositoryImpl repository = new KwhRepositoryImpl(client);
-        KwhServiceImpl service = new KwhServiceImpl(repository, null);
-
-        List<PowerMetric> metrics = service.get24HourData("kwh", "hour", "1", "place").getData();
-
-        System.out.println("size: " + metrics.size());
-
-        for(int i = 0; i < metrics.size(); i++) {
-            System.out.println("type: " + metrics.get(i).getType());
-            System.out.println("unit: " + metrics.get(i).getUnit());
-            System.out.println("per: " + metrics.get(i).getPer());
-            System.out.println("time: " + metrics.get(i).getTime());
-            System.out.println("value: " + metrics.get(i).getValue());
-            System.out.println("==================================================");
-        }
-    }
 
     @Test
     @DisplayName("24시간 Raw 데이터 조회 테스트")
