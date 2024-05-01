@@ -84,9 +84,8 @@ class KwhServiceImplTest {
         List<Kwh> startDataList = kwhRepository.getCurrentMonthStartData(testTopic);
         List<Kwh> endDataList = kwhRepository.getCurrentMonthEndData(testTopic);
 
-        for (int i = 0; i < startDataList.size(); i++) {
-            result += endDataList.get(i).getValue() - startDataList.get(i).getValue();
-        }
+        for (Kwh kwh : endDataList) result += kwh.getValue();
+        for (Kwh kwh : startDataList) result -= kwh.getValue();
 
         for(int i = 0; i < startDataList.size(); i++) {
             System.out.println("place: " + startDataList.get(i).getPlace());

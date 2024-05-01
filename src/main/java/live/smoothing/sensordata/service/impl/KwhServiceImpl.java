@@ -98,9 +98,8 @@ public class KwhServiceImpl implements KwhService {
         List<Kwh> startDataList = kwhRepository.getCurrentMonthStartData(topics);
         List<Kwh> endDataList = kwhRepository.getCurrentMonthEndData(topics);
 
-        for (int i = 0; i < startDataList.size(); i++) {
-            result += endDataList.get(i).getValue() - startDataList.get(i).getValue();
-        }
+        for (Kwh kwh : endDataList) result += kwh.getValue();
+        for (Kwh kwh : startDataList) result -= kwh.getValue();
 
         return result;
     }

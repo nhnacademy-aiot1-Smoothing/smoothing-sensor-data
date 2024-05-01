@@ -106,8 +106,6 @@ public class KwhRepositoryImpl implements KwhRepository {
                 topics
         );
 
-        System.out.println(firstQuery.toString());
-
         return rawInfluxClient.getQueryApi().query(firstQuery.toString(), Kwh.class);
     }
 
