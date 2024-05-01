@@ -115,8 +115,7 @@ public class KwhRepositoryImpl implements KwhRepository {
         Flux lastQuery = getLastKwhFromStart(
                 RAW_BUCKET,
                 "mqtt_consumer",
-                TimeUtil.getRecentHour(timeProvider.nowInstant(), 1)
-                        .minus(1, ChronoUnit.HOURS),
+                TimeUtil.getRecentMonth(timeProvider.nowInstant(), 1),
                 topics
         );
 
