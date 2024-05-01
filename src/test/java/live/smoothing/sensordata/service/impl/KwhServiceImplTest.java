@@ -38,4 +38,11 @@ class KwhServiceImplTest {
             System.out.println("==================================================");
         }
     }
+
+    @Test
+    void splitTest() {
+        String test = "a,b,c,d,e,f";
+        String[] split = test.split(",");
+        System.out.println(split[0]);
+    }
 }

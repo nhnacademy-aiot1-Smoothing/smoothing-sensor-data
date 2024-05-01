@@ -1,5 +1,6 @@
 package live.smoothing.sensordata.service.impl;
 
+import live.smoothing.sensordata.adapter.TopicAdapter;
 import live.smoothing.sensordata.dto.Kwh;
 import live.smoothing.sensordata.dto.PowerMetric;
 import live.smoothing.sensordata.dto.PowerMetricResponse;
@@ -23,7 +24,7 @@ import java.util.List;
 public class KwhServiceImpl implements KwhService {
 
     private final KwhRepository kwhRepository;
-    private final String[] testTopics = {"V"};
+    private final TopicAdapter topicAdapter;
 
     /**
      * 24시간 동안의 데이터를 조회하여 반환
@@ -37,7 +38,8 @@ public class KwhServiceImpl implements KwhService {
     @Override
     public PowerMetricResponse get24HourData(String type, String unit, String per, String tags) {
 
-        List<Kwh> kwhList = kwhRepository.get24HourData(testTopics);
+        String[] topics = getTopics(tags);
+        List<Kwh> kwhList = kwhRepository.get24HourData(topics);
         List<PowerMetric> metricList = new ArrayList<>();
 
         for(int i = 0; i < kwhList.size() - 1; i++) {
@@ -46,7 +48,7 @@ public class KwhServiceImpl implements KwhService {
                 metricList.add(powerMetric);
             }
         }
-        List<Kwh> rawList = kwhRepository.get24Raw(testTopics);
+        List<Kwh> rawList = kwhRepository.get24Raw(topics);
 
         PowerMetric powerMetric = new PowerMetric("kwh", "hour", "1", rawList.get(0).getTime(), getGap(rawList));
         metricList.add(powerMetric);
@@ -65,7 +67,8 @@ public class KwhServiceImpl implements KwhService {
     @Override
     public PowerMetricResponse getWeekData(String type, String unit, String per, String tags) {
 
-        List<Kwh> list = kwhRepository.getWeekData(testTopics);
+        String[] topics = getTopics(tags);
+        List<Kwh> list = kwhRepository.getWeekData(topics);
         List<PowerMetric> metricList = new ArrayList<>();
 
         for(int i=0; i < list.size()-1; i++) {
@@ -74,7 +77,7 @@ public class KwhServiceImpl implements KwhService {
                 metricList.add(powerMetric);
             }
         }
-        List<Kwh> rawList = kwhRepository.getWeekRaw(testTopics);
+        List<Kwh> rawList = kwhRepository.getWeekRaw(topics);
         PowerMetric powerMetric = new PowerMetric("kwh", "day", "1", rawList.get(0).getTime(), getGap(rawList));
         metricList.add(powerMetric);
 
@@ -89,6 +92,10 @@ public class KwhServiceImpl implements KwhService {
      */
     private double getGap(List<Kwh> list) {
         return list.get(list.size() - 1).getValue() - list.get(0).getValue();
+    }
+
+    private String[] getTopics(String tags) {
+        return topicAdapter.getTopicWithTopics(tags).getTopics().toArray(new String[0]);
     }
 
 }

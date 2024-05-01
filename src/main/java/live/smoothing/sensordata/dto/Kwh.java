@@ -18,5 +18,4 @@ public class Kwh {
     private String place;
     private String topic;
     private Double value;
-
 }

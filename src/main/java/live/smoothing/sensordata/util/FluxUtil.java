@@ -1,6 +1,7 @@
 package live.smoothing.sensordata.util;
 
 import com.influxdb.query.dsl.Flux;
+import com.influxdb.query.dsl.functions.restriction.Restrictions;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
@@ -38,7 +39,7 @@ public class FluxUtil {
         return Flux.from(bucketName)
                 .range(start)
                 .filter(measurement().equal(measurementName))
-//                .filter(Restrictions.tag("topic").contains(topics))
+                .filter(Restrictions.tag("topic").contains(topics))
                 .pivot()
                 .withRowKey(new String[]{ROW_KEY})
                 .withColumnKey(new String[]{COLUMN_KEY})

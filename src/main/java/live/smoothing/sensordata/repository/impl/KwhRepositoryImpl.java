@@ -62,7 +62,7 @@ public class KwhRepositoryImpl implements KwhRepository {
                 getFlux(
                         AGGREGATION2_BUCKET,
                         "kwh_daily",
-                        Instant.now(),
+                        Instant.now().minus(1, ChronoUnit.WEEKS),
                         topics
                 );
 
