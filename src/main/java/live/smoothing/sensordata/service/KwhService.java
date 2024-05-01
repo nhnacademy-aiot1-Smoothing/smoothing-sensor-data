@@ -1,6 +1,7 @@
 package live.smoothing.sensordata.service;
 
-import live.smoothing.sensordata.dto.PowerMetricResponse;
+
+import live.smoothing.sensordata.dto.watt.PowerMetricResponse;
 
 /**
  * 전력 관련 서비스

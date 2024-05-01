@@ -1,7 +1,7 @@
 package live.smoothing.sensordata.controller;
 
 import live.smoothing.common.exception.CommonException;
-import live.smoothing.sensordata.dto.PowerMetricResponse;
+import live.smoothing.sensordata.dto.watt.PowerMetricResponse;
 import live.smoothing.sensordata.service.KwhService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -27,14 +27,6 @@ public class KwhController {
             return kwhService.getWeekData(type, unit, per.toString(), tags);
         }
 
-        throw new RuntimeException();
+        throw new CommonException(HttpStatus.NOT_FOUND, "Not Found");
     }
 }
-//        if(Integer.parseInt(unit) == 10 && per.equals("min")) {
-//            return kwhService.get10MinuteWattData(type, unit, per, tags);
-//        } else if(Integer.parseInt(unit) == 1 && per.equals("hour")) {
-//            return wattService.get1HourWattData(type, unit, per, tags);
-//        }
-//
-//        throw new CommonException(HttpStatus.NOT_FOUND, "");
-
