@@ -3,8 +3,10 @@ package live.smoothing.sensordata.util;
 import com.influxdb.query.dsl.Flux;
 import com.influxdb.query.dsl.functions.restriction.Restrictions;
 
+import java.lang.reflect.Array;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
 
 import static com.influxdb.query.dsl.functions.restriction.Restrictions.measurement;
 
@@ -36,10 +38,22 @@ public class FluxUtil {
                                Instant start,
                                String[] topics
     ) {
+        if (topics.length == 0) {
+            throw new IllegalArgumentException("Topics array cannot be empty");
+        }
+
+
+        Restrictions topicFilter = Restrictions.tag("topic").equal(topics[0]);
+
+        for (int i = 1; i < topics.length; i++) {
+            topicFilter = Restrictions.or(topicFilter, Restrictions.tag("topic").equal(topics[i]));
+        }
+
         return Flux.from(bucketName)
                 .range(start)
                 .filter(measurement().equal(measurementName))
-                .filter(Restrictions.tag("topic").contains(topics))
+                .filter(topicFilter)
+                .filter(Restrictions.or())
                 .pivot()
                 .withRowKey(new String[]{ROW_KEY})
                 .withColumnKey(new String[]{COLUMN_KEY})
