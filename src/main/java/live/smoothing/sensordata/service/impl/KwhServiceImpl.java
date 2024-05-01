@@ -12,8 +12,6 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
 
-// TODO: topicAdapter
-// TODO: Tag 받아서 파싱.
 /**
  * 전력관련 서비스 구현체
  *
