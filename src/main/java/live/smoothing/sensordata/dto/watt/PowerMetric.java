@@ -1,11 +1,10 @@
-package live.smoothing.sensordata.dto;
+package live.smoothing.sensordata.dto.watt;
 
 import lombok.Builder;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 import java.time.Instant;
-import java.time.LocalDateTime;
 
 /**
  * 전력 관련 DTO
