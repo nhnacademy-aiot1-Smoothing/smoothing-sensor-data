@@ -1,9 +1,10 @@
 package live.smoothing.sensordata.service.impl;
 
 import live.smoothing.sensordata.adapter.TopicAdapter;
-import live.smoothing.sensordata.entity.Kwh;
 import live.smoothing.sensordata.dto.watt.PowerMetric;
 import live.smoothing.sensordata.dto.watt.PowerMetricResponse;
+import live.smoothing.sensordata.dto.watt.SensorTopicResponse;
+import live.smoothing.sensordata.entity.Kwh;
 import live.smoothing.sensordata.repository.KwhRepository;
 import live.smoothing.sensordata.service.KwhService;
 import lombok.RequiredArgsConstructor;
@@ -17,11 +18,13 @@ import java.util.List;
 /**
  * 전력관련 서비스 구현체
  *
- * @author 신민석
+ * @author 신민석, 박영준
  */
 @Service
 @RequiredArgsConstructor
 public class KwhServiceImpl implements KwhService {
+
+    private static final String TOPIC_TYPE_NAME = "전력량";
 
     private final KwhRepository kwhRepository;
     private final TopicAdapter topicAdapter;
@@ -84,6 +87,24 @@ public class KwhServiceImpl implements KwhService {
         return new PowerMetricResponse(List.of(tags), metricList);
     }
 
+    @Override
+    public Double getCurrentMonthKwh() {
+
+        double result = 0.0;
+
+        SensorTopicResponse topicAll = topicAdapter.getTopicAll(TOPIC_TYPE_NAME);
+        String[] topics = topicAll.getTopics().toArray(new String[0]);
+
+        List<Kwh> startDataList = kwhRepository.getCurrentMonthStartData(topics);
+        List<Kwh> endDataList = kwhRepository.getCurrentMonthEndData(topics);
+
+        for (int i = 0; i < startDataList.size(); i++) {
+            result += endDataList.get(i).getValue() - startDataList.get(i).getValue();
+        }
+
+        return result;
+    }
+
 
     /**
      * Kwh 리스트의 처음과 끝의 값을 빼서 차이를 반환
@@ -95,7 +116,7 @@ public class KwhServiceImpl implements KwhService {
     }
 
     private String[] getTopics(String tags) {
-        return topicAdapter.getTopicWithTopics(tags).getTopics().toArray(new String[0]);
+        return topicAdapter.getTopicWithTopics(tags, TOPIC_TYPE_NAME).getTopics().toArray(new String[0]);
     }
 
 }

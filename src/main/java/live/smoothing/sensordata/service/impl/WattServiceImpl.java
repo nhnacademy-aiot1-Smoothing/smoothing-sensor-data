@@ -21,6 +21,8 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class WattServiceImpl implements WattService {
 
+    private static final String TOPIC_TYPE_NAME = "전력";
+
     private final WattRepository wattRepository;
     private final TopicAdapter topicAdapter;
 
@@ -96,6 +98,7 @@ public class WattServiceImpl implements WattService {
     }
 
     private String[] getTopics(String tags) {
-        return topicAdapter.getTopicWithTopics(tags).getTopics().toArray(new String[0]);
+        return topicAdapter.getTopicWithTopics(tags, TOPIC_TYPE_NAME)
+                .getTopics().toArray(new String[0]);
     }
 }
