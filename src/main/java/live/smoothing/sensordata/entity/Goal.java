@@ -1,4 +1,4 @@
-package live.smoothing.sensordata.enttiy;
+package live.smoothing.sensordata.entity;
 
 import lombok.*;
 
@@ -26,7 +26,10 @@ public class Goal {
     @Column(name = "goal_amount")
     private Long goalAmount;
 
-    @Column(name = "unitPrice")
+    @Column(name = "amount")
+    private Long amount;
+
+    @Column(name = "unit_price")
     private Integer unitPrice;
 }
 

@@ -1,6 +1,6 @@
 package live.smoothing.sensordata.repository;
 
-import live.smoothing.sensordata.dto.Kwh;
+import live.smoothing.sensordata.entity.Kwh;
 
 import java.util.List;
 

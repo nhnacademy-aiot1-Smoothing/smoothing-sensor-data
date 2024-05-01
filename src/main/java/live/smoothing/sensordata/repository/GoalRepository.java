@@ -1,6 +1,6 @@
 package live.smoothing.sensordata.repository;
 
-import live.smoothing.sensordata.enttiy.Goal;
+import live.smoothing.sensordata.entity.Goal;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 

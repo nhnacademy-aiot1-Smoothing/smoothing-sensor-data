@@ -1,6 +1,6 @@
 package live.smoothing.sensordata.repository;
 
-import live.smoothing.sensordata.enttiy.Goal;
+import live.smoothing.sensordata.entity.Goal;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
