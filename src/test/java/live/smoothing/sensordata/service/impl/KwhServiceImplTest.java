@@ -23,7 +23,7 @@ class KwhServiceImplTest {
     void get24HourData() {
 
         KwhRepositoryImpl repository = new KwhRepositoryImpl(client);
-        KwhServiceImpl service = new KwhServiceImpl(repository);
+        KwhServiceImpl service = new KwhServiceImpl(repository, null);
 
         List<PowerMetric> metrics = service.get24HourData("kwh", "hour", "1", "place").getData();
 
