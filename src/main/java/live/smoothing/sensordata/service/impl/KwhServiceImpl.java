@@ -1,7 +1,7 @@
 package live.smoothing.sensordata.service.impl;
 
 import live.smoothing.sensordata.adapter.TopicAdapter;
-import live.smoothing.sensordata.dto.Kwh;
+import live.smoothing.sensordata.enttiy.Kwh;
 import live.smoothing.sensordata.dto.watt.PowerMetric;
 import live.smoothing.sensordata.dto.watt.PowerMetricResponse;
 import live.smoothing.sensordata.repository.KwhRepository;

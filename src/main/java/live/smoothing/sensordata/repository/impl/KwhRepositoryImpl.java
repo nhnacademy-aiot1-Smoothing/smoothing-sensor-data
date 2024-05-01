@@ -3,7 +3,7 @@ package live.smoothing.sensordata.repository.impl;
 import com.influxdb.client.InfluxDBClient;
 import com.influxdb.query.dsl.Flux;
 import live.smoothing.sensordata.config.InfluxDBConfig;
-import live.smoothing.sensordata.dto.Kwh;
+import live.smoothing.sensordata.enttiy.Kwh;
 import live.smoothing.sensordata.repository.KwhRepository;
 import live.smoothing.sensordata.util.TimeUtil;
 import lombok.RequiredArgsConstructor;

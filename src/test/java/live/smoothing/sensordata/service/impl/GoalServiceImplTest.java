@@ -1,5 +1,6 @@
 package live.smoothing.sensordata.service.impl;
 
+import live.smoothing.sensordata.dto.goal.GoalHistoryResponse;
 import live.smoothing.sensordata.dto.goal.GoalResponse;
 import live.smoothing.sensordata.enttiy.Goal;
 import live.smoothing.sensordata.repository.GoalRepository;
@@ -83,12 +84,12 @@ class GoalServiceImplTest {
         when(goalRepository.findAllByYear(2021)).thenReturn(goalList);
 
         // when
-        goalService.getGoalHistory(2021);
+        List<GoalHistoryResponse> goalHistory = goalService.getGoalHistory(2021);
 
         // then
         verify(goalRepository, times(1)).findAllByYear(2021);
 
-        // 비교 로직 추가 예정
+        assertThat(goalHistory.size()).isEqualTo(3);
     }
 
     @Test

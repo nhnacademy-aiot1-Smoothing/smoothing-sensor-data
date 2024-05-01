@@ -3,7 +3,7 @@ package live.smoothing.sensordata.repository.impl;
 import com.influxdb.client.InfluxDBClient;
 import com.influxdb.query.dsl.Flux;
 import com.influxdb.query.dsl.functions.restriction.Restrictions;
-import live.smoothing.sensordata.dto.watt.Watt;
+import live.smoothing.sensordata.enttiy.Watt;
 import live.smoothing.sensordata.repository.WattRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
