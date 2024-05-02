@@ -1,7 +1,7 @@
 package live.smoothing.sensordata.controller;
 
 import live.smoothing.common.exception.CommonException;
-import live.smoothing.sensordata.dto.watt.PowerMetricResponse;
+import live.smoothing.sensordata.dto.TagPowerMetricResponse;
 import live.smoothing.sensordata.service.WattService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -16,7 +16,7 @@ public class WattController {
     private final WattService wattService;
 
     @GetMapping("/api/sensor/watt")
-    public PowerMetricResponse getWattData10Minute (@RequestParam String type,
+    public TagPowerMetricResponse getWattData10Minute (@RequestParam String type,
                                                        @RequestParam String unit,
                                                        @RequestParam String per,
                                                        @RequestParam String tags) {
