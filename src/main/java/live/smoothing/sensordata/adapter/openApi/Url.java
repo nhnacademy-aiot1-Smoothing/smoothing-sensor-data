@@ -14,5 +14,4 @@ public class Url {
         return String.format(url, year, month, bizCd);
     }
 
-
 }
