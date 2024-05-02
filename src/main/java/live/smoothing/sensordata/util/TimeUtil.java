@@ -7,6 +7,8 @@ import java.time.temporal.TemporalAdjusters;
 /**
  * 시간 관련 유틸리티 클래스
  *
+ * 해당 시간들은 모두 UTC 시간에 맞춰서 반환된다.
+ *
  * @author 박영준
  */
 public class TimeUtil {
@@ -58,7 +60,16 @@ public class TimeUtil {
                 .truncatedTo(ChronoUnit.DAYS).toInstant();
     }
 
-    public static Instant getNow(LocalDateTime now) {
-        return now.toInstant(ZoneOffset.of("+09:00"));
+    /**
+     * 오늘 일자 자정을 반환한다.
+     *
+     * @param source 기준 시간
+     * @return 시간
+     */
+    public static Instant getRecentDay(Instant source) {
+        return source
+                .plus(9L, ChronoUnit.HOURS)
+                .truncatedTo(ChronoUnit.DAYS)
+                .minus(9L, ChronoUnit.HOURS);
     }
 }
