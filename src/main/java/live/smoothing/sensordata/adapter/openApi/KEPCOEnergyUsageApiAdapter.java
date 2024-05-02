@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import live.smoothing.common.exception.CommonException;
 import live.smoothing.sensordata.adapter.EnergyUsageApiAdapter;
 import live.smoothing.sensordata.dto.usage.EnergyUsageResponse;
+import live.smoothing.sensordata.prop.Url;
 import live.smoothing.sensordata.util.JsonUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpMethod;

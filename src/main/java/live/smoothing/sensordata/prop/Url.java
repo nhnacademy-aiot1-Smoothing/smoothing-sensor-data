@@ -1,4 +1,4 @@
-package live.smoothing.sensordata.adapter.openApi;
+package live.smoothing.sensordata.prop;
 
 import lombok.Getter;
 
