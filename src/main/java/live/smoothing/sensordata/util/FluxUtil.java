@@ -34,12 +34,13 @@ public class FluxUtil {
     public static Flux getKwhFromStart(String bucketName,
                                        String measurementName,
                                        Instant start,
+                                       Instant end,
                                        String[] topics
     ) {
         Restrictions orRestrictions = getOrRestrictions(topics);
 
         return Flux.from(bucketName)
-                .range(start)
+                .range(start, end)
                 .filter(measurement().equal(measurementName))
                 .filter(orRestrictions)
                 .pivot()

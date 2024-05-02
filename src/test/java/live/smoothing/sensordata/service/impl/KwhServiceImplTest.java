@@ -1,9 +1,11 @@
 package live.smoothing.sensordata.service.impl;
 
 import live.smoothing.sensordata.config.InfluxDBConfig;
+import live.smoothing.sensordata.dto.kwh.KwhTimeZoneResponse;
 import live.smoothing.sensordata.entity.Kwh;
 import live.smoothing.sensordata.repository.impl.KwhRepositoryImpl;
 import live.smoothing.sensordata.util.TimeProvider;
+import live.smoothing.sensordata.util.TimeUtil;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -14,11 +16,13 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 class CustomTimeProvider implements TimeProvider {
     @Override
     public LocalDateTime now() {
-        return LocalDateTime.of(2024, 5, 1, 0, 0);
+        return LocalDateTime.of(2024, 5, 2, 5, 0);
     }
 
     @Override
@@ -30,7 +34,12 @@ class CustomTimeProvider implements TimeProvider {
 @SpringBootTest
 class KwhServiceImplTest {
 
-    private final String[] testTopic = {"data/s/nhnacademy/b/gyeongnam/p/class_a/d/gems-3500/e/electrical_energy/t/ac_indoor_unit/ph/kwh/de/sum"};
+    private final String[] testTopic = {
+            "data/s/nhnacademy/b/gyeongnam/p/class_a/d/gems-3500/e/electrical_energy/t/ac_indoor_unit/ph/kwh/de/sum",
+            "data/s/nhnacademy/b/gyeongnam/p/office/d/gems-3500/e/electrical_energy/t/air_conditioner/ph/kwh/de/sum",
+            "data/s/nhnacademy/b/gyeongnam/p/office/d/gems-3500/e/electrical_energy/t/pair_rm_heating/ph/kwh/de/sum",
+            "data/s/nhnacademy/b/gyeongnam/p/office/d/gems-3500/e/electrical_energy/t/meeting_rm_heating/ph/kwh/de/sum"
+    };
     @Autowired
     private InfluxDBConfig client;
 
@@ -104,5 +113,42 @@ class KwhServiceImplTest {
         }
 
         System.out.println(result);
+    }
+
+    @Test
+    @DisplayName("최근 일주일 1시간 단위로 가져오기")
+    void testGetWeekDataByHour() {
+        List<KwhTimeZoneResponse> kwhTimeZoneResponses = List.of(
+                new KwhTimeZoneResponse("evening", 0.0),
+                new KwhTimeZoneResponse("afternoon", 0.0),
+                new KwhTimeZoneResponse("morning", 0.0),
+                new KwhTimeZoneResponse("dawn", 0.0)
+        );
+
+        KwhRepositoryImpl kwhRepository = new KwhRepositoryImpl(client.rawInfluxClient(), client.aggregationInfluxClient(), timeProvider);
+
+        List<Kwh> kwhList = kwhRepository.getWeekDataByHour(testTopic);
+
+        Map<Instant, Double> sumByTimezone = kwhList.stream()
+                .collect(Collectors.groupingBy(Kwh::getTime,
+                        Collectors.summingDouble(Kwh::getValue)));
+
+        List<Map.Entry<Instant, Double>> collect = sumByTimezone.entrySet().stream()
+                .sorted(Map.Entry.comparingByKey())
+                .collect(Collectors.toList());
+
+        for (int i = collect.size()-1, valueIndex = 0; i > 0; i -= 6, valueIndex = (valueIndex + 1) % 4) {
+            for (int j = 0; j <= 5; j++) {
+                kwhTimeZoneResponses.get(valueIndex)
+                        .setValue(kwhTimeZoneResponses.get(valueIndex).getValue() + (collect.get(i - j).getValue() - collect.get(i - j - 1).getValue()));
+            }
+        }
+    }
+
+    @Test
+    @DisplayName("now Instant test")
+    void testNowInstant() {
+        System.out.println(TimeUtil.getRecentDay(timeProvider.nowInstant()));
+        System.out.println(timeProvider.nowInstant());
     }
 }

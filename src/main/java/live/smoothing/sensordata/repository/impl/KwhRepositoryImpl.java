@@ -45,6 +45,7 @@ public class KwhRepositoryImpl implements KwhRepository {
                         AGGREGATION_BUCKET,
                         "kwh_hour",
                         timeProvider.nowInstant().minus(1, ChronoUnit.DAYS),
+                        timeProvider.nowInstant(),
                         topics
                 );
 
@@ -63,7 +64,9 @@ public class KwhRepositoryImpl implements KwhRepository {
                 getKwhFromStart(
                         AGGREGATION2_BUCKET,
                         "kwh_daily",
-                        timeProvider.nowInstant().minus(1, ChronoUnit.WEEKS),
+                        timeProvider.nowInstant()
+                                .minus(7, ChronoUnit.DAYS),
+                        timeProvider.nowInstant(),
                         topics
                 );
 
@@ -122,8 +125,24 @@ public class KwhRepositoryImpl implements KwhRepository {
         return rawInfluxClient.getQueryApi().query(lastQuery.toString(), Kwh.class);
     }
 
+    @Override
+    public List<Kwh> getWeekDataByHour(String[] topics) {
+        Flux query =
+                getKwhFromStart(
+                        AGGREGATION_BUCKET,
+                        "kwh_hour",
+                        TimeUtil.getRecentDay(timeProvider.nowInstant()
+                                .minus(7, ChronoUnit.DAYS)),
+                        TimeUtil.getRecentDay(timeProvider.nowInstant())
+                                .plus(30, ChronoUnit.MINUTES),
+                        topics
+                );
+
+        return aggregationInfluxClient.getQueryApi().query(query.toString(), Kwh.class);
+    }
+
     /**
-     * InfluxDB에 저장된 데이터를 조회하여 7일 동안의 데이터를 반환(raw 데이터)
+     * InfluxDB에 저장된 데이터를 조회하여 가장 최근 데이터를 반환
      *
      * @param topics 조회할 topic의 이름들
      * @return 원시 Kwh의 리스트를 반환
@@ -136,6 +155,7 @@ public class KwhRepositoryImpl implements KwhRepository {
                         AGGREGATION2_BUCKET,
                         "kwh_daily",
                         timeProvider.nowInstant().minus(1L, ChronoUnit.DAYS),
+                        timeProvider.nowInstant(),
                         topics
                 );
 

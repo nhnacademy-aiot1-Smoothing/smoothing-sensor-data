@@ -2,7 +2,7 @@ package live.smoothing.sensordata.service.impl;
 
 import live.smoothing.sensordata.adapter.TopicAdapter;
 import live.smoothing.sensordata.dto.watt.PowerMetric;
-import live.smoothing.sensordata.dto.watt.PowerMetricResponse;
+import live.smoothing.sensordata.dto.TagPowerMetricResponse;
 import live.smoothing.sensordata.entity.Watt;
 import live.smoothing.sensordata.repository.WattRepository;
 import live.smoothing.sensordata.service.WattService;
@@ -27,7 +27,7 @@ public class WattServiceImpl implements WattService {
     private final TopicAdapter topicAdapter;
 
     @Override
-    public PowerMetricResponse get10MinuteWattData(String type, String unit, String per, String tags) {
+    public TagPowerMetricResponse get10MinuteWattData(String type, String unit, String per, String tags) {
 
         String[] topics = getTopics(tags);
 
@@ -59,11 +59,11 @@ public class WattServiceImpl implements WattService {
                 )
                 .collect(Collectors.toList());
 
-        return new PowerMetricResponse(tagList, powerMetrics);
+        return new TagPowerMetricResponse(tagList, powerMetrics);
     }
 
     @Override
-    public PowerMetricResponse get1HourWattData(String type, String unit, String per, String tags) {
+    public TagPowerMetricResponse get1HourWattData(String type, String unit, String per, String tags) {
 
         String[] topics = getTopics(tags);
 
@@ -94,7 +94,7 @@ public class WattServiceImpl implements WattService {
                 )
                 .collect(Collectors.toList());
 
-        return new PowerMetricResponse(tagList, powerMetrics);
+        return new TagPowerMetricResponse(tagList, powerMetrics);
     }
 
     private String[] getTopics(String tags) {

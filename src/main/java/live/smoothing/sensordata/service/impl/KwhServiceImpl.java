@@ -1,8 +1,9 @@
 package live.smoothing.sensordata.service.impl;
 
 import live.smoothing.sensordata.adapter.TopicAdapter;
+import live.smoothing.sensordata.dto.kwh.KwhTimeZoneResponse;
 import live.smoothing.sensordata.dto.watt.PowerMetric;
-import live.smoothing.sensordata.dto.watt.PowerMetricResponse;
+import live.smoothing.sensordata.dto.TagPowerMetricResponse;
 import live.smoothing.sensordata.dto.watt.SensorTopicResponse;
 import live.smoothing.sensordata.entity.Kwh;
 import live.smoothing.sensordata.repository.KwhRepository;
@@ -10,11 +11,12 @@ import live.smoothing.sensordata.service.KwhService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
-// TODO: topicAdapter
-// TODO: Tag 받아서 파싱.
 /**
  * 전력관련 서비스 구현체
  *
@@ -39,7 +41,7 @@ public class KwhServiceImpl implements KwhService {
      * @return PowerMetricResponse
      */
     @Override
-    public PowerMetricResponse get24HourData(String type, String unit, String per, String tags) {
+    public TagPowerMetricResponse get24HourData(String type, String unit, String per, String tags) {
 
         String[] topics = getTopics(tags);
         List<Kwh> kwhList = kwhRepository.get24HourData(topics);
@@ -55,7 +57,7 @@ public class KwhServiceImpl implements KwhService {
 
         PowerMetric powerMetric = new PowerMetric("kwh", "hour", "1", rawList.get(0).getTime(), getGap(rawList));
         metricList.add(powerMetric);
-        return new PowerMetricResponse(List.of(tags), metricList);
+        return new TagPowerMetricResponse(List.of(tags), metricList);
     }
 
     /**
@@ -68,7 +70,7 @@ public class KwhServiceImpl implements KwhService {
      * @return PowerMetricResponse
      */
     @Override
-    public PowerMetricResponse getWeekData(String type, String unit, String per, String tags) {
+    public TagPowerMetricResponse getWeekData(String type, String unit, String per, String tags) {
 
         String[] topics = getTopics(tags);
         List<Kwh> list = kwhRepository.getWeekData(topics);
@@ -84,7 +86,7 @@ public class KwhServiceImpl implements KwhService {
         PowerMetric powerMetric = new PowerMetric("kwh", "day", "1", rawList.get(0).getTime(), getGap(rawList));
         metricList.add(powerMetric);
 
-        return new PowerMetricResponse(List.of(tags), metricList);
+        return new TagPowerMetricResponse(List.of(tags), metricList);
     }
 
     @Override
@@ -102,6 +104,41 @@ public class KwhServiceImpl implements KwhService {
         for (Kwh kwh : startDataList) result -= kwh.getValue();
 
         return result;
+    }
+
+    @Override
+    public List<KwhTimeZoneResponse> getWeeklyDataByTimeOfDay() {
+        List<KwhTimeZoneResponse> kwhTimeZoneResponses = List.of(
+                new KwhTimeZoneResponse("evening", 0.0),
+                new KwhTimeZoneResponse("afternoon", 0.0),
+                new KwhTimeZoneResponse("morning", 0.0),
+                new KwhTimeZoneResponse("dawn", 0.0)
+        );
+
+        SensorTopicResponse topicAll = topicAdapter.getTopicAll(TOPIC_TYPE_NAME);
+        String[] topics = topicAll.getTopics().toArray(new String[0]);
+
+        List<Kwh> weekDataByHour = kwhRepository.getWeekDataByHour(topics);
+
+        Map<Instant, Double> sumByTimezone = weekDataByHour.stream()
+                .collect(Collectors.groupingBy(Kwh::getTime,
+                        Collectors.summingDouble(Kwh::getValue)));
+
+        List<Map.Entry<Instant, Double>> collect = sumByTimezone.entrySet().stream()
+                .sorted(Map.Entry.comparingByKey())
+                .collect(Collectors.toList());
+
+        for (int i = collect.size()-1, valueIndex = 0; i > 0; i -= 6, valueIndex = (valueIndex + 1) % 4) {
+            for (int j = 0; j <= 5; j++) {
+                kwhTimeZoneResponses.get(valueIndex)
+                                .setValue(
+                                        kwhTimeZoneResponses.get(valueIndex).getValue()
+                                        + (collect.get(i - j).getValue() - collect.get(i - j - 1).getValue())
+                                );
+            }
+        }
+
+        return kwhTimeZoneResponses;
     }
 
 

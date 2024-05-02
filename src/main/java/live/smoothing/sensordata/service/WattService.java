@@ -1,9 +1,9 @@
 package live.smoothing.sensordata.service;
 
-import live.smoothing.sensordata.dto.watt.PowerMetricResponse;
+import live.smoothing.sensordata.dto.TagPowerMetricResponse;
 
 public interface WattService {
 
-    PowerMetricResponse get10MinuteWattData(String type, String unit, String per, String tags);
-    PowerMetricResponse get1HourWattData(String type, String unit, String per, String tags);
+    TagPowerMetricResponse get10MinuteWattData(String type, String unit, String per, String tags);
+    TagPowerMetricResponse get1HourWattData(String type, String unit, String per, String tags);
 }
