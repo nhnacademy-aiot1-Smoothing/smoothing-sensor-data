@@ -1,4 +1,4 @@
-package live.smoothing.sensordata.dto.watt;
+package live.smoothing.sensordata.dto;
 
 import lombok.Builder;
 import lombok.Getter;
