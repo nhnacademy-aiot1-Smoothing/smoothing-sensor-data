@@ -9,6 +9,7 @@ import live.smoothing.sensordata.util.TimeUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 
@@ -63,7 +64,7 @@ public class KwhRepositoryImpl implements KwhRepository {
         Flux query =
                 getKwhFromStart(
                         AGGREGATION2_BUCKET,
-                        "kwh_daily",
+                        "kwh_daily_test2",
                         timeProvider.nowInstant()
                                 .minus(7, ChronoUnit.DAYS),
                         timeProvider.nowInstant(),
@@ -141,6 +142,22 @@ public class KwhRepositoryImpl implements KwhRepository {
         return aggregationInfluxClient.getQueryApi().query(query.toString(), Kwh.class);
     }
 
+    @Override
+    public List<Kwh> getDailyDataByPeriod(String[] topics, Instant start, Instant end) {
+        Flux query =
+                getKwhFromStart(
+                        AGGREGATION2_BUCKET,
+                        "kwh_daily_test2",
+                        start,
+                        end,
+                        topics
+                );
+
+        System.out.println(query);
+
+        return aggregationInfluxClient.getQueryApi().query(query.toString(), Kwh.class);
+    }
+
     /**
      * InfluxDB에 저장된 데이터를 조회하여 가장 최근 데이터를 반환
      *
@@ -153,7 +170,7 @@ public class KwhRepositoryImpl implements KwhRepository {
         Flux query =
                 getKwhFromStart(
                         AGGREGATION2_BUCKET,
-                        "kwh_daily",
+                        "kwh_daily_test2",
                         timeProvider.nowInstant().minus(1L, ChronoUnit.DAYS),
                         timeProvider.nowInstant(),
                         topics

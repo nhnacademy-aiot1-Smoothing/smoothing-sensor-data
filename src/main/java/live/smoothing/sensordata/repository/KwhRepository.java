@@ -2,6 +2,7 @@ package live.smoothing.sensordata.repository;
 
 import live.smoothing.sensordata.entity.Kwh;
 
+import java.time.Instant;
 import java.util.List;
 
 /**
@@ -22,4 +23,6 @@ public interface KwhRepository {
     List<Kwh> getCurrentMonthEndData(String[] topics);
 
     List<Kwh> getWeekDataByHour(String[] topics);
+
+    List<Kwh> getDailyDataByPeriod(String[] topics, Instant start, Instant end);
 }
