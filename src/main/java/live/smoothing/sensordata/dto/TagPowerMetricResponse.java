@@ -1,6 +1,5 @@
 package live.smoothing.sensordata.dto;
 
-import live.smoothing.sensordata.dto.watt.PowerMetric;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
