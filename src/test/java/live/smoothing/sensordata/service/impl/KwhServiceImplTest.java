@@ -41,11 +41,11 @@ class CustomTimeProvider implements TimeProvider {
 class KwhServiceImplTest {
 
     private final String[] testTopic = {
-//            "data/s/nhnacademy/b/gyeongnam/p/class_a/d/gems-3500/e/electrical_energy/t/ac_indoor_unit/ph/kwh/de/sum",
-//            "data/s/nhnacademy/b/gyeongnam/p/office/d/gems-3500/e/electrical_energy/t/air_conditioner/ph/kwh/de/sum",
-//            "data/s/nhnacademy/b/gyeongnam/p/office/d/gems-3500/e/electrical_energy/t/pair_rm_heating/ph/kwh/de/sum",
-//            "data/s/nhnacademy/b/gyeongnam/p/office/d/gems-3500/e/electrical_energy/t/meeting_rm_heating/ph/kwh/de/sum",
-//            "data/s/nhnacademy/b/gyeongnam/p/class_a/d/gems-3500/e/electrical_energy/t/main/ph/kwh/de/sum",
+            "data/s/nhnacademy/b/gyeongnam/p/class_a/d/gems-3500/e/electrical_energy/t/ac_indoor_unit/ph/kwh/de/sum",
+            "data/s/nhnacademy/b/gyeongnam/p/office/d/gems-3500/e/electrical_energy/t/air_conditioner/ph/kwh/de/sum",
+            "data/s/nhnacademy/b/gyeongnam/p/office/d/gems-3500/e/electrical_energy/t/pair_rm_heating/ph/kwh/de/sum",
+            "data/s/nhnacademy/b/gyeongnam/p/office/d/gems-3500/e/electrical_energy/t/meeting_rm_heating/ph/kwh/de/sum",
+            "data/s/nhnacademy/b/gyeongnam/p/class_a/d/gems-3500/e/electrical_energy/t/main/ph/kwh/de/sum",
             "data/s/nhnacademy/b/gyeongnam/p/office/d/gems-3500/e/electrical_energy/t/main/ph/kwh/de/sum"
     };
     @Autowired

@@ -29,7 +29,6 @@ public class KwhRepositoryImpl implements KwhRepository {
     private final TimeProvider timeProvider;
 
     private static final String AGGREGATION_BUCKET = "aggregation";
-    private static final String AGGREGATION2_BUCKET = "aggregation2";
     private static final String RAW_BUCKET = "powermetrics_data";
 
 
@@ -63,8 +62,8 @@ public class KwhRepositoryImpl implements KwhRepository {
     public List<Kwh> getWeekData(String[] topics) {
         Flux query =
                 getKwhFromStart(
-                        AGGREGATION2_BUCKET,
-                        "kwh_daily_test2",
+                        AGGREGATION_BUCKET,
+                        "kwh_daily4",
                         timeProvider.nowInstant()
                                 .minus(7, ChronoUnit.DAYS),
                         timeProvider.nowInstant(),
@@ -146,8 +145,8 @@ public class KwhRepositoryImpl implements KwhRepository {
     public List<Kwh> getDailyDataByPeriod(String[] topics, Instant start, Instant end) {
         Flux query =
                 getKwhFromStart(
-                        AGGREGATION2_BUCKET,
-                        "kwh_daily_test2",
+                        AGGREGATION_BUCKET,
+                        "kwh_daily4",
                         start,
                         end,
                         topics
@@ -169,8 +168,8 @@ public class KwhRepositoryImpl implements KwhRepository {
 
         Flux query =
                 getKwhFromStart(
-                        AGGREGATION2_BUCKET,
-                        "kwh_daily_test2",
+                        AGGREGATION_BUCKET,
+                        "kwh_daily4",
                         timeProvider.nowInstant().minus(1L, ChronoUnit.DAYS),
                         timeProvider.nowInstant(),
                         topics
