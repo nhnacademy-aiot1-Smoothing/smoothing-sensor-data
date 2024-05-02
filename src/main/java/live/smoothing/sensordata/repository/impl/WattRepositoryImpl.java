@@ -2,19 +2,18 @@ package live.smoothing.sensordata.repository.impl;
 
 import com.influxdb.client.InfluxDBClient;
 import com.influxdb.query.dsl.Flux;
-import com.influxdb.query.dsl.functions.restriction.Restrictions;
 import live.smoothing.sensordata.entity.Watt;
 import live.smoothing.sensordata.repository.WattRepository;
+import live.smoothing.sensordata.util.FluxUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
 import java.time.Instant;
-import java.time.temporal.ChronoUnit;
 import java.util.List;
 
 @Repository
 @RequiredArgsConstructor
-public class InfluxDBWattRepository implements WattRepository {
+public class WattRepositoryImpl implements WattRepository {
 
     private final InfluxDBClient rawInfluxClient;
     private final InfluxDBClient aggregationInfluxClient;
@@ -24,24 +23,26 @@ public class InfluxDBWattRepository implements WattRepository {
 
     @Override
     public List<Watt> getRawWattData(Instant start, String[] topics, String measurement) {
-        Flux flux = Flux.from(RAW_BUCKET_NAME)
-                .range(start)
-                .filter(Restrictions.measurement().equal(measurement))
-                .filter(Restrictions.tag("topic").contains(topics))
-                .sum()
-                .map("({ r with _time: time(v: now())})")
-                .timeShift(9L, ChronoUnit.HOURS);
+
+        Flux flux = FluxUtil.getWattSumFromStart(
+                RAW_BUCKET_NAME,
+                measurement,
+                start,
+                topics
+        );
 
         return rawInfluxClient.getQueryApi().query(flux.toString(), Watt.class);
     }
 
     @Override
     public List<Watt> getAggregateWattData(Instant start, String[] topics, String measurement) {
-        Flux flux = Flux.from(AGGREGATION_BUCKET_NAME)
-                .range(start)
-                .filter(Restrictions.measurement().equal(measurement))
-                .filter(Restrictions.tag("topic").contains(topics))
-                .timeShift(9L, ChronoUnit.HOURS);
+
+        Flux flux = FluxUtil.getAggregationWattFromStart(
+                AGGREGATION_BUCKET_NAME,
+                measurement,
+                start,
+                topics
+        );
 
         return aggregationInfluxClient.getQueryApi().query(flux.toString(), Watt.class);
     }

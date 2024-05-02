@@ -15,7 +15,7 @@ public class KwhController {
 
     private final KwhService kwhService;
 
-    @GetMapping("api/sensor/usage")
+    @GetMapping("/api/sensor/kwh")
     public PowerMetricResponse getKwh(@RequestParam String type,
                                       @RequestParam String unit,
                                       @RequestParam Integer per,

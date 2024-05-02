@@ -42,7 +42,7 @@ class GoalServiceImplTest {
     void getGoal() {
         Goal goal = Goal.builder()
                 .goalDate(LocalDateTime.of(LocalDate.of(2021, 3, 1), LocalDateTime.MIN.toLocalTime()))
-                .goalAmount(3000L)
+                .goalAmount(3000.0)
                 .unitPrice(300)
                 .build();
 
@@ -66,17 +66,17 @@ class GoalServiceImplTest {
         List<Goal> goalList = List.of(
                 Goal.builder()
                         .goalDate(LocalDateTime.of(LocalDate.of(2021, 3, 1), LocalDateTime.MIN.toLocalTime()))
-                        .goalAmount(3000L)
+                        .goalAmount(3000.0)
                         .unitPrice(300)
                         .build(),
                 Goal.builder()
                         .goalDate(LocalDateTime.of(LocalDate.of(2021, 2, 1), LocalDateTime.MIN.toLocalTime()))
-                        .goalAmount(2000L)
+                        .goalAmount(2000.0)
                         .unitPrice(200)
                         .build(),
                 Goal.builder()
                         .goalDate(LocalDateTime.of(LocalDate.of(2021, 1, 1), LocalDateTime.MIN.toLocalTime()))
-                        .goalAmount(1000L)
+                        .goalAmount(1000.0)
                         .unitPrice(100)
                         .build()
         );
@@ -113,7 +113,7 @@ class GoalServiceImplTest {
         // given
         Goal goal = Goal.builder()
                 .goalDate(LocalDateTime.of(LocalDate.of(2020, 4, 1), LocalDateTime.MIN.toLocalTime()))
-                .goalAmount(3000L)
+                .goalAmount(3000.0)
                 .unitPrice(300)
                 .build();
 
@@ -132,7 +132,7 @@ class GoalServiceImplTest {
         // given
         Goal goal = Goal.builder()
                 .goalDate(LocalDateTime.of(LocalDate.of(2021, 3, 1), LocalDateTime.MIN.toLocalTime()))
-                .goalAmount(3000L)
+                .goalAmount(3000.0)
                 .unitPrice(300)
                 .build();
 
@@ -151,7 +151,7 @@ class GoalServiceImplTest {
         // given
         Goal goal = Goal.builder()
                 .goalDate(LocalDateTime.of(LocalDate.of(2021, 4, 1), LocalDateTime.MIN.toLocalTime()))
-                .goalAmount(3000L)
+                .goalAmount(3000.0)
                 .unitPrice(300)
                 .build();
 

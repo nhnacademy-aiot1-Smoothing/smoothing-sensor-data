@@ -10,6 +10,6 @@ import lombok.Setter;
 @AllArgsConstructor
 @NoArgsConstructor
 public class GoalRequest {
-    private Long goalAmount;
+    private Double goalAmount;
     private Integer unitPrice;
 }
