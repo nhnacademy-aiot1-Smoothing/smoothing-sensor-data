@@ -3,6 +3,7 @@ package live.smoothing.sensordata.service.impl;
 import live.smoothing.sensordata.adapter.TopicAdapter;
 import live.smoothing.sensordata.dto.PowerMetric;
 import live.smoothing.sensordata.dto.TagPowerMetricResponse;
+import live.smoothing.sensordata.dto.ThreadLocalUserId;
 import live.smoothing.sensordata.entity.Watt;
 import live.smoothing.sensordata.repository.WattRepository;
 import live.smoothing.sensordata.service.WattService;
@@ -38,26 +39,11 @@ public class WattServiceImpl implements WattService {
 
         List<Watt> rawWattData = wattRepository.getRawWattData(rawStart, topics, "mqtt_consumer");
         List<Watt> aggregateWattData = wattRepository.getAggregateWattData(aggregationStart, topics, "w_10m");
-
-        List<String> tagList = Arrays.stream(tags.split(",")).collect(Collectors.toList());
-
         rawWattData.addAll(aggregateWattData);
 
-        Map<Instant, Double> sumByTimezone = rawWattData.stream()
-                .collect(Collectors.groupingBy(Watt::getTime,
-                        Collectors.summingDouble(Watt::getValue)));
-
-        List<PowerMetric> powerMetrics = sumByTimezone.entrySet().stream()
-                .sorted(Map.Entry.comparingByKey())
-                .map(entry -> PowerMetric.builder()
-                        .type(type)
-                        .unit(unit)
-                        .per(per)
-                        .time(entry.getKey())
-                        .value(entry.getValue())
-                        .build()
-                )
-                .collect(Collectors.toList());
+        List<String> tagList = getTagList(tags);
+        Map<Instant, Double> sumByTimezone = getSumByTimezone(rawWattData);
+        List<PowerMetric> powerMetrics = getPowerMetricsByMap(sumByTimezone, type, unit, per);
 
         return new TagPowerMetricResponse(tagList, powerMetrics);
     }
@@ -73,16 +59,33 @@ public class WattServiceImpl implements WattService {
 
         List<Watt> rawWattData = wattRepository.getRawWattData(rawStart, topics, "mqtt_consumer");
         List<Watt> aggregateWattData = wattRepository.getAggregateWattData(aggregationStart, topics, "w_hour");
-
-        List<String> tagList = Arrays.stream(tags.split(",")).collect(Collectors.toList());
-
         rawWattData.addAll(aggregateWattData);
 
-        Map<Instant, Double> sumByTimezone = rawWattData.stream()
+        List<String> tagList = getTagList(tags);
+        Map<Instant, Double> sumByTimezone = getSumByTimezone(rawWattData);
+        List<PowerMetric> powerMetrics = getPowerMetricsByMap(sumByTimezone, type, unit, per);
+
+        return new TagPowerMetricResponse(tagList, powerMetrics);
+    }
+
+    private String[] getTopics(String tags) {
+        String userId = ThreadLocalUserId.getUserId();
+        return topicAdapter.getTopicWithTopics(tags, TOPIC_TYPE_NAME, userId)
+                .getTopics().toArray(new String[0]);
+    }
+
+    private List<String> getTagList(String tags) {
+        return Arrays.stream(tags.split(",")).collect(Collectors.toList());
+    }
+
+    private Map<Instant, Double> getSumByTimezone(List<Watt> wattList) {
+        return wattList.stream()
                 .collect(Collectors.groupingBy(Watt::getTime,
                         Collectors.summingDouble(Watt::getValue)));
+    }
 
-        List<PowerMetric> powerMetrics = sumByTimezone.entrySet().stream()
+    private List<PowerMetric> getPowerMetricsByMap(Map<Instant, Double> sumByTimezone, String type, String unit, String per) {
+        return sumByTimezone.entrySet().stream()
                 .sorted(Map.Entry.comparingByKey())
                 .map(entry -> PowerMetric.builder()
                         .type(type)
@@ -93,12 +96,5 @@ public class WattServiceImpl implements WattService {
                         .build()
                 )
                 .collect(Collectors.toList());
-
-        return new TagPowerMetricResponse(tagList, powerMetrics);
-    }
-
-    private String[] getTopics(String tags) {
-        return topicAdapter.getTopicWithTopics(tags, TOPIC_TYPE_NAME)
-                .getTopics().toArray(new String[0]);
     }
 }

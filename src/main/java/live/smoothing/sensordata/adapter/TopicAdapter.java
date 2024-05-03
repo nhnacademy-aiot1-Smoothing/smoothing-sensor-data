@@ -11,12 +11,14 @@ public interface TopicAdapter {
 
     @GetMapping("/api/device/topics")
     TopicResponse getTopicWithTopics(@RequestParam("tags") String tags,
-                                     @RequestParam("type") String type);
+                                     @RequestParam("type") String type,
+                                     @RequestParam("userId") String userId);
 
     @GetMapping("/api/device/topics/all")
     TopicResponse getTopicAll(@RequestParam("type") String type);
 
     @GetMapping("/api/device/topics/sensor")
     SensorTopicResponse getSensorWithTopics(@RequestParam("tags") String tags,
-                                            @RequestParam("type") String type);
+                                            @RequestParam("type") String type,
+                                            @RequestParam("userId") String userId);
 }
