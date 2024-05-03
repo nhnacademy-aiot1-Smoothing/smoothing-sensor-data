@@ -48,7 +48,9 @@ class GoalControllerTest {
 
         // when
         // then
-        mockMvc.perform(get("/api/sensor/goals"))
+        mockMvc.perform(get("/api/sensor/goals")
+                    .header("X-USER-ID", "test-user")
+                )
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.goalAmount").value(0L))
                 .andExpect(jsonPath("$.unitPrice").value(0));
@@ -64,8 +66,10 @@ class GoalControllerTest {
         // when
         // then
         mockMvc.perform(post("/api/sensor/goals")
-                .contentType("application/json")
-                .content(objectMapper.writeValueAsString(goalRequest)))
+                    .contentType("application/json")
+                    .content(objectMapper.writeValueAsString(goalRequest))
+                    .header("X-USER-ID", "test-user")
+                )
                 .andExpect(status().isCreated());
 
         then(goalService).should(times(1)).saveGoal(any());
@@ -83,7 +87,9 @@ class GoalControllerTest {
         // then
         mockMvc.perform(post("/api/sensor/goals")
                         .contentType("application/json")
-                        .content(objectMapper.writeValueAsString(goalRequest)))
+                        .content(objectMapper.writeValueAsString(goalRequest))
+                        .header("X-USER-ID", "test-user")
+                )
                 .andExpect(status().isCreated());
 
         then(goalService).should(times(0)).saveGoal(any());
@@ -118,7 +124,9 @@ class GoalControllerTest {
 
         // when
         // then
-        mockMvc.perform(get("/api/sensor/goals/history?year=2021"))
+        mockMvc.perform(get("/api/sensor/goals/history?year=2021")
+                        .header("X-USER-ID", "test-user")
+                )
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].date").value("2021-03-01T00:00:00"))
                 .andExpect(jsonPath("$[0].goalAmount").value(3000L))
@@ -142,7 +150,9 @@ class GoalControllerTest {
 
         // when
         // then
-        mockMvc.perform(get("/api/sensor/goals/kwh"))
+        mockMvc.perform(get("/api/sensor/goals/kwh")
+                        .header("X-USER-ID", "test-user")
+                )
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.goalAmount").value(123.0))
                 .andExpect(jsonPath("$.currentAmount").value(120.0));
