@@ -53,7 +53,6 @@ public class FluxUtil {
                 .range(start)
                 .filter(measurement().equal(measurementName))
                 .filter(topicFilter)
-                .filter(Restrictions.or())
                 .pivot()
                 .withRowKey(new String[]{ROW_KEY})
                 .withColumnKey(new String[]{COLUMN_KEY})

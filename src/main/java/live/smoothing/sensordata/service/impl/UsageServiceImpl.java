@@ -21,4 +21,3 @@ public class UsageServiceImpl implements UsageService {
         return apiAdapter.fetchEnergyUsage(year, month, bizCd);
     }
 }
-`
