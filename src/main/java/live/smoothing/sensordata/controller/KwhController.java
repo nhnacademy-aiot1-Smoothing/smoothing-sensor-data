@@ -36,7 +36,7 @@ public class KwhController {
 
         if(unit.equals("hour") && per.equals(1)) {
             return kwhService.get24HourData(type, unit, per.toString(), tags);
-        } else if(unit.equals("day") && per.equals(7)) {
+        } else if(unit.equals("day") && per.equals(1)) {
             return kwhService.getWeekData(type, unit, per.toString(), tags);
         }
 
@@ -62,7 +62,7 @@ public class KwhController {
         return kwhService.getDailyTotalDataByPeriod(startInstant, endInstant, tags);
     }
 
-    @GetMapping("/daily/peroid")
+    @GetMapping("/daily/period")
     public SensorPowerMetricResponse getDailyDataByPeriod(@RequestParam LocalDateTime start,
                                                           @RequestParam LocalDateTime end,
                                                           @RequestParam String tags) {
