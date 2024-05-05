@@ -86,7 +86,7 @@ public class KwhRepositoryImpl implements KwhRepository {
                 getLastKwhFromStart(
                         RAW_BUCKET,
                         "mqtt_consumer",
-                        TimeUtil.getRecentHour(timeProvider.nowInstant(), 1),
+                        TimeUtil.getRecentHour(timeProvider.nowInstant()),
                         topics
                 );
 
@@ -105,7 +105,7 @@ public class KwhRepositoryImpl implements KwhRepository {
         Flux firstQuery = getFirstKwhFromStart(
                 RAW_BUCKET,
                 "mqtt_consumer",
-                TimeUtil.getRecentMonth(timeProvider.nowInstant(), 1),
+                TimeUtil.getRecentMonth(timeProvider.nowInstant()),
                 topics
         );
 
@@ -118,7 +118,7 @@ public class KwhRepositoryImpl implements KwhRepository {
         Flux lastQuery = getLastKwhFromStart(
                 RAW_BUCKET,
                 "mqtt_consumer",
-                TimeUtil.getRecentMonth(timeProvider.nowInstant(), 1),
+                TimeUtil.getRecentMonth(timeProvider.nowInstant()),
                 topics
         );
 

@@ -169,17 +169,8 @@ public class KwhServiceImpl implements KwhService {
     @Override
     public TagPowerMetricResponse getDailyTotalDataByPeriod(Instant start, Instant end, String tags) {
 
-        String userId = ThreadLocalUserId.getUserId();
-        List<String> topicList;
-        if (tags.isEmpty()) {
-            topicList = topicAdapter.getTopicAll(TOPIC_TYPE_NAME).getTopics();
-        } else {
-            topicList = topicAdapter.getTopicWithTopics(tags, TOPIC_TYPE_NAME, userId).getTopics();
-        }
-        String[] topics = topicList.toArray(new String[0]);
-
+        String[] topics = getTopics(tags);
         List<Kwh> weekDataByPeriod = kwhRepository.getDailyDataByPeriod(topics, start, end);
-
         List<String> tagList = Arrays.stream(tags.split(",")).collect(Collectors.toList());
 
         Map<Instant, Double> sumByTimezone = getSumByTimezone(weekDataByPeriod);
@@ -192,11 +183,12 @@ public class KwhServiceImpl implements KwhService {
     public List<SensorPowerMetric> getDailyDataByPeriod(Instant start, Instant end, String tags) {
         String userId = ThreadLocalUserId.getUserId();
         SensorTopicResponse sensorWithTopics = topicAdapter.getSensorWithTopics(tags, TOPIC_TYPE_NAME, userId);
-        Map<String, String> topicSensorNameMap = new HashMap<>();
-        Map<String, List<Kwh>> sensorNameKwhMap = new HashMap<>();
         String[] topics = sensorWithTopics.getSensorWithTopics().stream()
                 .map(SensorWithTopic::getTopic)
                 .toArray(String[]::new);
+
+        Map<String, String> topicSensorNameMap = new HashMap<>();
+        Map<String, List<Kwh>> sensorNameKwhMap = new HashMap<>();
 
         for (SensorWithTopic sensorWithTopic : sensorWithTopics.getSensorWithTopics()) {
             topicSensorNameMap.put(sensorWithTopic.getTopic(), sensorWithTopic.getSensorName());
@@ -232,8 +224,26 @@ public class KwhServiceImpl implements KwhService {
     }
 
     private String[] getTopics(String tags) {
+
+        if (tags.isEmpty()) {
+            return getTopicAll();
+        } else {
+            return getTopicWithTags(tags);
+        }
+    }
+
+    private String[] getTopicAll() {
+
+        return topicAdapter.getTopicAll(TOPIC_TYPE_NAME)
+                .getTopics().toArray(new String[0]);
+    }
+
+    private String[] getTopicWithTags(String tags) {
+
         String userId = ThreadLocalUserId.getUserId();
-        return topicAdapter.getTopicWithTopics(tags, TOPIC_TYPE_NAME, userId).getTopics().toArray(new String[0]);
+
+        return topicAdapter.getTopicWithTags(tags, TOPIC_TYPE_NAME, userId)
+                .getTopics().toArray(new String[0]);
     }
 
     private Map<Instant, Double> getSumByTimezone(List<Kwh> kwhList) {

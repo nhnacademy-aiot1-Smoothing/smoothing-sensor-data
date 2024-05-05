@@ -54,8 +54,8 @@ public class WattServiceImpl implements WattService {
         String[] topics = getTopics(tags);
 
         Instant now = Instant.now();
-        Instant rawStart = TimeUtil.getRecentHour(now, 1);
-        Instant aggregationStart = TimeUtil.getRecentHour(now, 1).minus(23, ChronoUnit.HOURS);
+        Instant rawStart = TimeUtil.getRecentHour(now);
+        Instant aggregationStart = TimeUtil.getRecentHour(now).minus(23, ChronoUnit.HOURS);
 
         List<Watt> rawWattData = wattRepository.getRawWattData(rawStart, topics, "mqtt_consumer");
         List<Watt> aggregateWattData = wattRepository.getAggregateWattData(aggregationStart, topics, "w_hour");
@@ -70,8 +70,14 @@ public class WattServiceImpl implements WattService {
 
     private String[] getTopics(String tags) {
         String userId = ThreadLocalUserId.getUserId();
-        return topicAdapter.getTopicWithTopics(tags, TOPIC_TYPE_NAME, userId)
-                .getTopics().toArray(new String[0]);
+
+        if (tags.isEmpty()) {
+            return topicAdapter.getTopicAll(TOPIC_TYPE_NAME)
+                    .getTopics().toArray(new String[0]);
+        } else {
+            return topicAdapter.getTopicWithTags(tags, TOPIC_TYPE_NAME, userId)
+                    .getTopics().toArray(new String[0]);
+        }
     }
 
     private List<String> getTagList(String tags) {
