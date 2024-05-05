@@ -5,11 +5,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+//Todo: Week, Month, Year 리스트 조회
+
 @RestController
-@RequestMapping
+@RequestMapping("/api/sensor/statistics/")
 public class PowerStatisticsController {
 
-    @GetMapping("/api/sensor/electrical/range")
+    @GetMapping
     public String getElectricalRange(@RequestParam String type,
                                      @RequestParam Integer unit) {
 

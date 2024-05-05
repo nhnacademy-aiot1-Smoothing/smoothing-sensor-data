@@ -21,6 +21,11 @@ import java.time.ZoneOffset;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 
+/**
+ * Kwh 데이터 조회를 위한 Controller
+ *
+ * @author 신민석
+ */
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/sensor/kwh/usage")
@@ -28,6 +33,14 @@ public class KwhController {
 
     private final KwhService kwhService;
 
+    /**
+     *
+     * @param type 조회할 데이터 유형
+     * @param unit 시간 단위(ex. hour)
+     * @param per 시간 단위(ex. 1)
+     * @param tags 조회할 태그들
+     * @return 태그별로 구분된 전력 사용량 데이터를 반환
+     */
     @GetMapping
     public TagPowerMetricResponse getKwh(@RequestParam String type,
                                          @RequestParam String unit,

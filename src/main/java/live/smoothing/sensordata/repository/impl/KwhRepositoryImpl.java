@@ -94,10 +94,10 @@ public class KwhRepositoryImpl implements KwhRepository {
     }
 
     /**
-     * InfluxDB를 조회하여 현재 달의 처음과 끝 값을 반환
+     * InfluxDB를 조회하여 현재 달의 처음 값을 반환
      *
      * @param topics 조회할 topic의 이름들
-     * @return 현재 달의 처음과 끝 값 리스트
+     * @return 현재 달의 처음 값 리스트
      */
     @Override
     public List<Kwh> getCurrentMonthStartData(String[] topics) {
@@ -112,6 +112,12 @@ public class KwhRepositoryImpl implements KwhRepository {
         return rawInfluxClient.getQueryApi().query(firstQuery.toString(), Kwh.class);
     }
 
+    /**
+     * InfluxDB를 조회하여 현재 달의 끝 값을 반환
+     *
+     * @param topics 조회할 topic의 이름들
+     * @return 현재 달의 끝 값 리스트
+     */
     @Override
     public List<Kwh> getCurrentMonthEndData(String[] topics) {
 
