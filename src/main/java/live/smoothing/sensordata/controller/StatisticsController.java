@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/sensor/statistics/")
-public class PowerStatisticsController {
+public class StatisticsController {
 
     @GetMapping
     public String getElectricalRange(@RequestParam String type,
