@@ -28,6 +28,7 @@ public class FluxUtil {
      * @param bucketName 버킷 이름
      * @param measurementName 측정값 이름
      * @param start 시작 시간
+     * @param end 종료 시간
      * @param topics 토픽
      * @return Flux 쿼리
      */
@@ -101,9 +102,9 @@ public class FluxUtil {
     }
 
     public static Flux getWattSumFromStart(String bucketName,
-                                        String measurementName,
-                                        Instant start,
-                                        String[] topics
+                                           String measurementName,
+                                           Instant start,
+                                           String[] topics
     ) {
         Restrictions orRestrictions = getOrRestrictions(topics);
 
@@ -117,9 +118,9 @@ public class FluxUtil {
     }
 
     public static Flux getAggregationWattFromStart(String bucketName,
-                                               String measurementName,
-                                               Instant start,
-                                               String[] topics
+                                                   String measurementName,
+                                                   Instant start,
+                                                   String[] topics
     ) {
         Restrictions orRestrictions = getOrRestrictions(topics);
 
@@ -128,6 +129,20 @@ public class FluxUtil {
                 .filter(Restrictions.measurement().equal(measurementName))
                 .filter(orRestrictions)
                 .timeShift(9L, ChronoUnit.HOURS);
+    }
+
+    //Todo: 고쳐야함
+    public static Flux getAggregatedPowerUsage(String bucketName,
+                                               String measurementName,
+                                               Instant start,
+                                               Instant end,
+                                               String period) {
+        return Flux.from(bucketName)
+                .range(start, end)
+                .filter(measurement().equal(measurementName))
+                .window() //데이터를 시간별로 그루핑해줌
+                .withEvery(period) // 1mo, 1w, 1y 넣어주면 댐
+                .sum(); // 그룹 테이터를 합쳐줌i
     }
 
     /**
