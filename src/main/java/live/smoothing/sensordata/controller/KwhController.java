@@ -9,6 +9,7 @@ import live.smoothing.sensordata.dto.kwh.KwhTimeZoneResponse;
 import live.smoothing.sensordata.service.KwhService;
 import live.smoothing.sensordata.util.TimeUtil;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -22,7 +23,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.List;
 
 /**
- * Kwh 데이터 조회를 위한 Controller
+ * Influx DB에서 Kwh(전력사용량) 데이터 조회를 위한 Controller
  *
  * @author 신민석
  */
@@ -75,7 +76,7 @@ public class KwhController {
         return kwhService.getDailyTotalDataByPeriod(startInstant, endInstant, tags);
     }
 
-    @GetMapping("/daily/peroid")
+    @GetMapping("/daily/period")
     public SensorPowerMetricResponse getDailyDataByPeriod(@RequestParam LocalDateTime start,
                                                           @RequestParam LocalDateTime end,
                                                           @RequestParam String tags) {
