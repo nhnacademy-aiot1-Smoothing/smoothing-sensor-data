@@ -12,7 +12,6 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
-import java.util.Arrays;
 import java.util.List;
 
 import static org.mockito.BDDMockito.given;
@@ -51,8 +50,7 @@ class UsageControllerTest {
         energyUsage.setBill("150000");
         energyUsage.setUnitCost("30");
 
-        List<EnergyUsage> usageList = Arrays.asList(
-                energyUsage);
+        List<EnergyUsage> usageList = List.of(energyUsage);
         EnergyUsageResponse expectedResponse = new EnergyUsageResponse();
         expectedResponse.setData(usageList);
 
@@ -60,6 +58,7 @@ class UsageControllerTest {
 
         // when & then
         mockMvc.perform(get("/api/external/usage")
+                        .header("X-USER-ID", "test")
                         .param("year", String.valueOf(year))
                         .param("month", month)
                         .param("bizCd", bizCd)
@@ -87,6 +86,7 @@ class UsageControllerTest {
 
         // when & then
         mockMvc.perform(get("/api/external/usage")
+                        .header("X-USER-ID", "test")
                         .param("year", String.valueOf(year))
                         .param("month", month)
                         .param("bizCd", bizCd)
