@@ -1,7 +1,8 @@
 package live.smoothing.sensordata.service.impl;
 
+import live.smoothing.sensordata.dto.goal.GoalHistoryResponse;
 import live.smoothing.sensordata.dto.goal.GoalResponse;
-import live.smoothing.sensordata.enttiy.Goal;
+import live.smoothing.sensordata.entity.Goal;
 import live.smoothing.sensordata.repository.GoalRepository;
 import live.smoothing.sensordata.util.TimeProvider;
 import org.junit.jupiter.api.Assertions;
@@ -41,7 +42,7 @@ class GoalServiceImplTest {
     void getGoal() {
         Goal goal = Goal.builder()
                 .goalDate(LocalDateTime.of(LocalDate.of(2021, 3, 1), LocalDateTime.MIN.toLocalTime()))
-                .goalAmount(3000L)
+                .goalAmount(3000.0)
                 .unitPrice(300)
                 .build();
 
@@ -65,17 +66,17 @@ class GoalServiceImplTest {
         List<Goal> goalList = List.of(
                 Goal.builder()
                         .goalDate(LocalDateTime.of(LocalDate.of(2021, 3, 1), LocalDateTime.MIN.toLocalTime()))
-                        .goalAmount(3000L)
+                        .goalAmount(3000.0)
                         .unitPrice(300)
                         .build(),
                 Goal.builder()
                         .goalDate(LocalDateTime.of(LocalDate.of(2021, 2, 1), LocalDateTime.MIN.toLocalTime()))
-                        .goalAmount(2000L)
+                        .goalAmount(2000.0)
                         .unitPrice(200)
                         .build(),
                 Goal.builder()
                         .goalDate(LocalDateTime.of(LocalDate.of(2021, 1, 1), LocalDateTime.MIN.toLocalTime()))
-                        .goalAmount(1000L)
+                        .goalAmount(1000.0)
                         .unitPrice(100)
                         .build()
         );
@@ -83,12 +84,12 @@ class GoalServiceImplTest {
         when(goalRepository.findAllByYear(2021)).thenReturn(goalList);
 
         // when
-        goalService.getGoalHistory(2021);
+        List<GoalHistoryResponse> goalHistory = goalService.getGoalHistory(2021);
 
         // then
         verify(goalRepository, times(1)).findAllByYear(2021);
 
-        // 비교 로직 추가 예정
+        assertThat(goalHistory.size()).isEqualTo(3);
     }
 
     @Test
@@ -112,7 +113,7 @@ class GoalServiceImplTest {
         // given
         Goal goal = Goal.builder()
                 .goalDate(LocalDateTime.of(LocalDate.of(2020, 4, 1), LocalDateTime.MIN.toLocalTime()))
-                .goalAmount(3000L)
+                .goalAmount(3000.0)
                 .unitPrice(300)
                 .build();
 
@@ -131,7 +132,7 @@ class GoalServiceImplTest {
         // given
         Goal goal = Goal.builder()
                 .goalDate(LocalDateTime.of(LocalDate.of(2021, 3, 1), LocalDateTime.MIN.toLocalTime()))
-                .goalAmount(3000L)
+                .goalAmount(3000.0)
                 .unitPrice(300)
                 .build();
 
@@ -150,7 +151,7 @@ class GoalServiceImplTest {
         // given
         Goal goal = Goal.builder()
                 .goalDate(LocalDateTime.of(LocalDate.of(2021, 4, 1), LocalDateTime.MIN.toLocalTime()))
-                .goalAmount(3000L)
+                .goalAmount(3000.0)
                 .unitPrice(300)
                 .build();
 

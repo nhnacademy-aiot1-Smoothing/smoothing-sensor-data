@@ -5,15 +5,12 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.time.LocalDateTime;
-
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class GoalHistoryResponse {
+public class KwhGoalResponse {
 
-    private LocalDateTime date;
     private Double goalAmount;
-    private Double amount;
+    private Double currentAmount;
 }

@@ -3,7 +3,7 @@ package live.smoothing.sensordata.service.impl;
 import live.smoothing.sensordata.dto.goal.GoalHistoryResponse;
 import live.smoothing.sensordata.dto.goal.GoalRequest;
 import live.smoothing.sensordata.dto.goal.GoalResponse;
-import live.smoothing.sensordata.enttiy.Goal;
+import live.smoothing.sensordata.entity.Goal;
 import live.smoothing.sensordata.repository.GoalRepository;
 import live.smoothing.sensordata.service.GoalService;
 import live.smoothing.sensordata.util.TimeProvider;
@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -31,10 +32,15 @@ public class GoalServiceImpl implements GoalService {
     @Override
     public List<GoalHistoryResponse> getGoalHistory(Integer year) {
 
-        goalRepository.findAllByYear(year);
+        List<Goal> goals = goalRepository.findAllByYear(year);
 
-        // TODO: 전력량 조회
-        return null;
+        return goals.stream().map(goal ->
+                new GoalHistoryResponse(
+                        goal.getGoalDate(),
+                        goal.getGoalAmount(),
+                        goal.getAmount()
+                )
+        ).collect(Collectors.toList());
     }
 
 

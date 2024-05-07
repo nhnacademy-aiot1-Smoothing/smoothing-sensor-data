@@ -1,15 +1,16 @@
-package live.smoothing.sensordata.dto.goal;
+package live.smoothing.sensordata.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.List;
+
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class GoalRequest {
-    private Double goalAmount;
-    private Integer unitPrice;
+public class SensorPowerMetricResponse {
+    List<SensorPowerMetric> data;
 }

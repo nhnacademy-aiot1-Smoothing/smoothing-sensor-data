@@ -1,4 +1,4 @@
-package live.smoothing.sensordata.dto.goal;
+package live.smoothing.sensordata.dto.topic;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -9,7 +9,7 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class GoalRequest {
-    private Double goalAmount;
-    private Integer unitPrice;
+public class SensorWithTopic {
+    private String sensorName;
+    private String topic;
 }

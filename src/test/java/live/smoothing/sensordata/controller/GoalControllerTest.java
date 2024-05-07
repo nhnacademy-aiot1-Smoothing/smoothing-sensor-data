@@ -5,6 +5,7 @@ import live.smoothing.sensordata.dto.goal.GoalHistoryResponse;
 import live.smoothing.sensordata.dto.goal.GoalRequest;
 import live.smoothing.sensordata.dto.goal.GoalResponse;
 import live.smoothing.sensordata.service.GoalService;
+import live.smoothing.sensordata.service.KwhService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,6 +31,9 @@ class GoalControllerTest {
     @MockBean
     private GoalService goalService;
 
+    @MockBean
+    private KwhService kwhService;
+
     @Autowired
     private MockMvc mockMvc;
 
@@ -40,11 +44,13 @@ class GoalControllerTest {
     @DisplayName("목표 데이터를 가져올 때 적절한 응답이 반환된다.")
     void getGoalData() throws Exception {
         // given
-        given(goalService.getGoal()).willReturn(new GoalResponse(0L, 0));
+        given(goalService.getGoal()).willReturn(new GoalResponse(0.0, 0));
 
         // when
         // then
-        mockMvc.perform(get("/api/sensor/goals"))
+        mockMvc.perform(get("/api/sensor/goals")
+                    .header("X-USER-ID", "test-user")
+                )
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.goalAmount").value(0L))
                 .andExpect(jsonPath("$.unitPrice").value(0));
@@ -55,13 +61,15 @@ class GoalControllerTest {
     void saveGoal() throws Exception {
         // given
         given(goalService.existsByGoalDate()).willReturn(false);
-        GoalRequest goalRequest = new GoalRequest(0L, 0);
+        GoalRequest goalRequest = new GoalRequest(0.0, 0);
 
         // when
         // then
         mockMvc.perform(post("/api/sensor/goals")
-                .contentType("application/json")
-                .content(objectMapper.writeValueAsString(goalRequest)))
+                    .contentType("application/json")
+                    .content(objectMapper.writeValueAsString(goalRequest))
+                    .header("X-USER-ID", "test-user")
+                )
                 .andExpect(status().isCreated());
 
         then(goalService).should(times(1)).saveGoal(any());
@@ -73,13 +81,15 @@ class GoalControllerTest {
     void modifyGoal() throws Exception {
         // given
         given(goalService.existsByGoalDate()).willReturn(true);
-        GoalRequest goalRequest = new GoalRequest(0L, 0);
+        GoalRequest goalRequest = new GoalRequest(0.0, 0);
 
         // when
         // then
         mockMvc.perform(post("/api/sensor/goals")
                         .contentType("application/json")
-                        .content(objectMapper.writeValueAsString(goalRequest)))
+                        .content(objectMapper.writeValueAsString(goalRequest))
+                        .header("X-USER-ID", "test-user")
+                )
                 .andExpect(status().isCreated());
 
         then(goalService).should(times(0)).saveGoal(any());
@@ -93,20 +103,20 @@ class GoalControllerTest {
         List<GoalHistoryResponse> goalHistoryResponses = List.of(
                 new GoalHistoryResponse(
                         LocalDateTime.of(2021, 3, 1, 0, 0),
-                        3000L,
-                        300L
+                        3000.0,
+                        300.0
                 ),
 
                 new GoalHistoryResponse(
                         LocalDateTime.of(2021, 2, 1, 0, 0),
-                        2000L,
-                        200L
+                        2000.0,
+                        200.0
                 ),
 
                 new GoalHistoryResponse(
                         LocalDateTime.of(2021, 1, 1, 0, 0),
-                        1000L,
-                        100L
+                        1000.0,
+                        100.0
                 )
         );
 
@@ -114,7 +124,9 @@ class GoalControllerTest {
 
         // when
         // then
-        mockMvc.perform(get("/api/sensor/goals/history?year=2021"))
+        mockMvc.perform(get("/api/sensor/goals/history?year=2021")
+                        .header("X-USER-ID", "test-user")
+                )
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].date").value("2021-03-01T00:00:00"))
                 .andExpect(jsonPath("$[0].goalAmount").value(3000L))
@@ -127,5 +139,25 @@ class GoalControllerTest {
                 .andExpect(jsonPath("$[2].amount").value(100));
 
         then(goalService).should(times(1)).getGoalHistory(2021);
+    }
+
+    @Test
+    @DisplayName("현재 월의 목표 전력량을 가져올 때 적절한 응답이 반환된다.")
+    void getCurrentMonthKwhGoal() throws Exception {
+        // given
+        given(goalService.getGoal()).willReturn(new GoalResponse(123.0, 0));
+        given(kwhService.getCurrentMonthKwh()).willReturn(120.0);
+
+        // when
+        // then
+        mockMvc.perform(get("/api/sensor/goals/kwh")
+                        .header("X-USER-ID", "test-user")
+                )
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.goalAmount").value(123.0))
+                .andExpect(jsonPath("$.currentAmount").value(120.0));
+
+        then(goalService).should(times(1)).getGoal();
+        then(kwhService).should(times(1)).getCurrentMonthKwh();
     }
 }
