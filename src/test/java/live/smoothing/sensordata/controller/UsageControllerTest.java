@@ -3,7 +3,6 @@ package live.smoothing.sensordata.controller;
 import live.smoothing.sensordata.dto.usage.EnergyUsage;
 import live.smoothing.sensordata.dto.usage.EnergyUsageResponse;
 import live.smoothing.sensordata.service.UsageService;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,8 +26,6 @@ class UsageControllerTest {
 
     @MockBean
     private UsageService usageService;
-
-    @BeforeEach
 
     @Test
     @DisplayName("에너지 사용 데이터를 요청 응답 테스트")
