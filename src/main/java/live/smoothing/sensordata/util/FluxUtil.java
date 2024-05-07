@@ -136,13 +136,18 @@ public class FluxUtil {
                                                String measurementName,
                                                Instant start,
                                                Instant end,
-                                               String period) {
+                                               String period,
+                                               String[] topics) {
+
+        Restrictions orRestrictions = getOrRestrictions(topics);
+
         return Flux.from(bucketName)
                 .range(start, end)
                 .filter(measurement().equal(measurementName))
+                .filter(orRestrictions)
                 .window() //데이터를 시간별로 그루핑해줌
                 .withEvery(period) // 1mo, 1w, 1y 넣어주면 댐
-                .sum(); // 그룹 테이터를 합쳐줌i
+                .sum(); // 그룹 테이터를 합쳐줌
     }
 
     /**
