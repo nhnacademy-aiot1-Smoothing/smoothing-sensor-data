@@ -18,10 +18,10 @@ public class WattController {
     private final WattService wattService;
 
     @GetMapping
-    public TagPowerMetricResponse getWattData10Minute (@RequestParam String type,
-                                                       @RequestParam String unit,
-                                                       @RequestParam String per,
-                                                       @RequestParam String tags) {
+    public TagPowerMetricResponse getWattData (@RequestParam String type,
+                                               @RequestParam String unit,
+                                               @RequestParam String per,
+                                               @RequestParam String tags) {
 
         if ("min".equals(unit) && Integer.parseInt(per) == 10) {
             return wattService.get10MinuteWattData(type, unit, per, tags);
