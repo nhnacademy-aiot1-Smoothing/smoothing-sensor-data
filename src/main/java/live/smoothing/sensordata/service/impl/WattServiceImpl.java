@@ -36,9 +36,14 @@ public class WattServiceImpl implements WattService {
         Instant rawStart = TimeUtil.getRecentMinute(now, 10);
         Instant aggregationStart = TimeUtil.getRecentMinute(now, 10).minus(2, ChronoUnit.HOURS);
 
-
         List<Watt> rawWattData = wattRepository.getRawWattData(rawStart, topics, "mqtt_consumer");
         List<Watt> aggregateWattData = wattRepository.getAggregateWattData(aggregationStart, topics, "w_10m");
+
+        for (Watt raw : rawWattData) {
+            raw.setTime(TimeUtil.getRecentMinute(raw.getTime(), 10)
+                    .plus(10, ChronoUnit.MINUTES));
+        }
+
         rawWattData.addAll(aggregateWattData);
 
         List<String> tagList = getTagList(tags);
@@ -59,6 +64,12 @@ public class WattServiceImpl implements WattService {
 
         List<Watt> rawWattData = wattRepository.getRawWattData(rawStart, topics, "mqtt_consumer");
         List<Watt> aggregateWattData = wattRepository.getAggregateWattData(aggregationStart, topics, "w_hour");
+
+        for (Watt raw : rawWattData) {
+            raw.setTime(TimeUtil.getRecentHour(raw.getTime())
+                    .plus(1, ChronoUnit.HOURS));
+        }
+
         rawWattData.addAll(aggregateWattData);
 
         List<String> tagList = getTagList(tags);
