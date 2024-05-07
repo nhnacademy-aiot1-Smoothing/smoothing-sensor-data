@@ -29,15 +29,14 @@ public class KwhController {
     private final KwhService kwhService;
 
     @GetMapping
-    public TagPowerMetricResponse getKwh(@RequestParam String type,
-                                         @RequestParam String unit,
+    public TagPowerMetricResponse getKwh(@RequestParam String unit,
                                          @RequestParam Integer per,
                                          @RequestParam String tags) {
 
         if(unit.equals("hour") && per.equals(1)) {
-            return kwhService.get24HourData(type, unit, per.toString(), tags);
+            return kwhService.get24HourData(per.toString(), tags);
         } else if(unit.equals("day") && per.equals(1)) {
-            return kwhService.getWeekData(type, unit, per.toString(), tags);
+            return kwhService.getWeekData(per.toString(), tags);
         }
 
         throw new CommonException(HttpStatus.NOT_FOUND, "Not Found");

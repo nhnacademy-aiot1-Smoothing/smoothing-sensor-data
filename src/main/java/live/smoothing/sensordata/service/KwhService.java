@@ -15,9 +15,9 @@ import java.util.List;
  */
 public interface KwhService {
 
-    TagPowerMetricResponse get24HourData(String type, String unit, String per, String tags);
+    TagPowerMetricResponse get24HourData(String per, String tags);
 
-    TagPowerMetricResponse getWeekData(String type, String unit, String per, String tags);
+    TagPowerMetricResponse getWeekData(String per, String tags);
 
     Double getCurrentMonthKwh();
 
