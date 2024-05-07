@@ -2,9 +2,8 @@ package live.smoothing.sensordata.repository.impl;
 
 import com.influxdb.client.InfluxDBClient;
 import com.influxdb.client.QueryApi;
-import com.influxdb.query.FluxTable;
 import com.influxdb.query.dsl.Flux;
-import live.smoothing.sensordata.entity.Kwh;
+import live.smoothing.sensordata.dto.statistics.KwhTimeSeriesResponse;
 import live.smoothing.sensordata.repository.StatisticsRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -13,12 +12,18 @@ import java.time.Instant;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static live.smoothing.sensordata.util.FluxUtil.getKwhFromStart;
+import static live.smoothing.sensordata.util.FluxUtil.getAggregatedPowerUsage;
 
+/**
+ * InfluxDB를 이용한 StatisticsRepository 구현체
+ *
+ * @author 신민석
+ */
 @Service
 public class StatisticsRepositoryImpl implements StatisticsRepository {
 
     private final InfluxDBClient aggregationInfluxClient;
+
     //Todo: 버킷이름
     private static final String BUCKET = "";
 
@@ -27,30 +32,30 @@ public class StatisticsRepositoryImpl implements StatisticsRepository {
         this.aggregationInfluxClient = aggregationInfluxClient;
     }
 
-    public List<Kwh> getPowerUsageData(String measurement,
-                                       Instant start,
-                                       Instant end,
-                                       String[] topics) {
+    @Override
+    public KwhTimeSeriesResponse getPowerUsageData(String measurement,
+                                                   Instant start,
+                                                   Instant end,
+                                                   String[] topics,
+                                                   String period) {
 
         Flux query =
-                getKwhFromStart(
+                getAggregatedPowerUsage(
                         BUCKET,
                         measurement,
                         start,
                         end,
+                        period,
                         topics
                 );
 
         QueryApi queryApi = aggregationInfluxClient.getQueryApi();
-        List<FluxTable> tables = queryApi.query(query.toString());
-
-        return tables.stream()
+        List<Double> values = queryApi.query(query.toString())
+                .stream()
                 .flatMap(table -> table.getRecords().stream())
-                .map(record -> {
-                    Kwh kwh = new Kwh();
-                    kwh.setTime(record.getTime());
-                    kwh.setValue((Double) record.getValueByKey("_value"));
-                    return kwh;
-                }).collect(Collectors.toList());
+                .map(record -> (Double) record.getValueByKey("_value"))
+                .collect(Collectors.toList());
+
+        return new KwhTimeSeriesResponse(period, values);
     }
 }
