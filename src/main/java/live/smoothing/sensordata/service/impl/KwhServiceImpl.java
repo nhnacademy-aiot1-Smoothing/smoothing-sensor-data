@@ -213,6 +213,18 @@ public class KwhServiceImpl implements KwhService {
         return sensorPowerMetrics;
     }
 
+    @Override
+    public TagPowerMetricResponse getHourlyTotalData() {
+        String[] topics = getTopicAll();
+        List<Kwh> hourlyTotalData = kwhRepository.getHourlyTotalData(topics);
+
+        Map<Instant, Double> sumByTimezone = getSumByTimezone(hourlyTotalData);
+        List<Map.Entry<Instant, Double>> collect = getSortedByTimeList(sumByTimezone);
+        List<PowerMetric> powerMetrics = getPowerMetricsByList(collect);
+
+        return new TagPowerMetricResponse(List.of(), powerMetrics);
+    }
+
 
     /**
      * Kwh 리스트의 처음과 끝의 값을 빼서 차이를 반환
