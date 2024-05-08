@@ -34,89 +34,101 @@ public class KwhServiceImpl implements KwhService {
     private final TopicAdapter topicAdapter;
 
     /**
-     * 24시간 동안의 데이터를 조회하여 반환
+     * 최근 24시간 동안의 데이터를 조회하여 반환
      *
-     * @param type 조회할 데이터의 타입
-     * @param unit 조회할 데이터의 단위
      * @param per 조회할 데이터의 주기
      * @param tags 조회할 데이터의 태그
      * @return PowerMetricResponse
      */
     @Override
-    public TagPowerMetricResponse get24HourData(String type, String unit, String per, String tags) {
+    public TagPowerMetricResponse get24HourData(String per, String tags) {
 
         String[] topics = getTopics(tags);
+
         List<Kwh> kwhList = kwhRepository.get24HourData(topics);
+        List<String> tagList = Arrays.stream(tags.split(",")).collect(Collectors.toList());
+        Map<Instant, Double> sumByTimezone = getSumByTimezone(kwhList);
+        List<Map.Entry<Instant, Double>> collect = getSortedByTimeList(sumByTimezone);
+
         List<PowerMetric> metricList = new ArrayList<>();
 
-        for(int i = 0; i < kwhList.size() - 1; i++) {
-            if(kwhList.get(i + 1) != null) {
+        for(int i = 0; i < collect.size() - 1; i++) {
+            if(collect.get(i + 1) != null) {
                 PowerMetric powerMetric = new PowerMetric(
                         "kwh",
                         "hour",
                         "1",
-                        kwhList.get(i).getTime(),
-                        getGap(kwhList)
+                        collect.get(i).getKey(),
+                        collect.get(i + 1).getValue() - collect.get(i).getValue()
                 );
 
                 metricList.add(powerMetric);
             }
         }
         List<Kwh> rawList = kwhRepository.get24Raw(topics);
+        Map<Instant, Double> rawSumByTimezone = getSumByTimezone(rawList);
+        List<Map.Entry<Instant, Double>> rawCollect = getSortedByTimeList(rawSumByTimezone);
 
         PowerMetric powerMetric = new PowerMetric(
                 "kwh",
                 "hour",
                 "1",
-                rawList.get(0).getTime(),
-                getGap(rawList)
+                rawCollect.get(0).getKey(),
+                rawCollect.get(rawCollect.size()-1).getValue() - rawCollect.get(0).getValue()
         );
 
         metricList.add(powerMetric);
-        return new TagPowerMetricResponse(List.of(tags), metricList);
+        return new TagPowerMetricResponse(tagList, metricList);
     }
 
     /**
      * 7일 동안의 데이터를 조회하여 반환
      *
-     * @param type 조회할 데이터의 타입
-     * @param unit 조회할 데이터의 단위
      * @param per 조회할 데이터의 주기
      * @param tags 조회할 데이터의 태그
      * @return PowerMetricResponse
      */
     @Override
-    public TagPowerMetricResponse getWeekData(String type, String unit, String per, String tags) {
+    public TagPowerMetricResponse getWeekData(String per, String tags) {
 
         String[] topics = getTopics(tags);
+
         List<Kwh> list = kwhRepository.getWeekData(topics);
+        List<String> tagList = Arrays.stream(tags.split(",")).collect(Collectors.toList());
+        Map<Instant, Double> sumByTimezone = getSumByTimezone(list);
+        List<Map.Entry<Instant, Double>> collect = getSortedByTimeList(sumByTimezone);
+
         List<PowerMetric> metricList = new ArrayList<>();
 
-        for(int i=0; i < list.size()-1; i++) {
-            if(list.get(i + 1) != null) {
+        for(int i=0; i < collect.size()-1; i++) {
+            if(collect.get(i + 1) != null) {
                 PowerMetric powerMetric = new PowerMetric(
                         "kwh",
                         "day",
                         "1",
-                        list.get(i).getTime(),
-                        getGap(list)
+                        collect.get(i).getKey(),
+                        collect.get(i+1).getValue() - collect.get(i).getValue()
                 );
 
                 metricList.add(powerMetric);
             }
         }
+
         List<Kwh> rawList = kwhRepository.getWeekRaw(topics);
+        Map<Instant, Double> rawSumByTimezone = getSumByTimezone(rawList);
+        List<Map.Entry<Instant, Double>> rawCollect = getSortedByTimeList(rawSumByTimezone);
+
         PowerMetric powerMetric = new PowerMetric(
                 "kwh",
                 "day",
                 "1",
-                rawList.get(0).getTime(),
-                getGap(rawList)
+                rawCollect.get(0).getKey(),
+                rawCollect.get(rawCollect.size()-1).getValue() - rawCollect.get(0).getValue()
         );
 
         metricList.add(powerMetric);
 
-        return new TagPowerMetricResponse(List.of(tags), metricList);
+        return new TagPowerMetricResponse(tagList, metricList);
     }
 
     @Override

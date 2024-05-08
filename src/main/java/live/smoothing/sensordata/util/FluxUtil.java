@@ -117,9 +117,9 @@ public class FluxUtil {
     }
 
     public static Flux getAggregationWattFromStart(String bucketName,
-                                               String measurementName,
-                                               Instant start,
-                                               String[] topics
+                                                   String measurementName,
+                                                   Instant start,
+                                                   String[] topics
     ) {
         Restrictions orRestrictions = getOrRestrictions(topics);
 
