@@ -4,6 +4,7 @@ package live.smoothing.sensordata.service;
 import live.smoothing.sensordata.dto.SensorPowerMetric;
 import live.smoothing.sensordata.dto.TagPowerMetricResponse;
 import live.smoothing.sensordata.dto.kwh.KwhTimeZoneResponse;
+import live.smoothing.sensordata.dto.kwh.TagSensorValue;
 
 import java.time.Instant;
 import java.util.List;
@@ -26,6 +27,8 @@ public interface KwhService {
     TagPowerMetricResponse getDailyTotalDataByPeriod(Instant start, Instant end, String tags);
 
     List<SensorPowerMetric> getDailyDataByPeriod(Instant start, Instant end, String tags);
+
+    List<TagSensorValue> getTotalSesnorData(String tags, Instant start, Instant end);
 
     TagPowerMetricResponse getHourlyTotalData();
 }
