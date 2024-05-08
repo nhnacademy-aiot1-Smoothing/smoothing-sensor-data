@@ -26,4 +26,6 @@ public interface KwhService {
     TagPowerMetricResponse getDailyTotalDataByPeriod(Instant start, Instant end, String tags);
 
     List<SensorPowerMetric> getDailyDataByPeriod(Instant start, Instant end, String tags);
+
+    TagPowerMetricResponse getHourlyTotalData();
 }

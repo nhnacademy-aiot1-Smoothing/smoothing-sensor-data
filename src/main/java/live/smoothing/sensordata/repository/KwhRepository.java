@@ -25,4 +25,6 @@ public interface KwhRepository {
     List<Kwh> getWeekDataByHour(String[] topics);
 
     List<Kwh> getDailyDataByPeriod(String[] topics, Instant start, Instant end);
+
+    List<Kwh> getHourlyTotalData(String[] topics);
 }

@@ -152,7 +152,19 @@ public class KwhRepositoryImpl implements KwhRepository {
                         topics
                 );
 
-        System.out.println(query);
+        return aggregationInfluxClient.getQueryApi().query(query.toString(), Kwh.class);
+    }
+
+    @Override
+    public List<Kwh> getHourlyTotalData(String[] topics) {
+        Flux query =
+                getKwhFromStart(
+                        AGGREGATION_BUCKET,
+                        "kwh_hour",
+                        Instant.ofEpochMilli(0),
+                        timeProvider.nowInstant(),
+                        topics
+                );
 
         return aggregationInfluxClient.getQueryApi().query(query.toString(), Kwh.class);
     }

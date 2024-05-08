@@ -74,4 +74,9 @@ public class KwhController {
         List<SensorPowerMetric> dailyDataByPeriod = kwhService.getDailyDataByPeriod(startInstant, endInstant, tags);
         return new SensorPowerMetricResponse(dailyDataByPeriod);
     }
+
+    @GetMapping("/hourly/total")
+    public TagPowerMetricResponse getHourlyTotalData() {
+        return kwhService.getHourlyTotalData();
+    }
 }

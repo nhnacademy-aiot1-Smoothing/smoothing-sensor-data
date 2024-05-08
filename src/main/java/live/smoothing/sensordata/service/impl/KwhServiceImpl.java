@@ -187,7 +187,7 @@ public class KwhServiceImpl implements KwhService {
 
         Map<Instant, Double> sumByTimezone = getSumByTimezone(weekDataByPeriod);
         List<Map.Entry<Instant, Double>> collect = getSortedByTimeList(sumByTimezone);
-        List<PowerMetric> powerMetrics = getPowerMetricsByList(collect);
+        List<PowerMetric> powerMetrics = getPowerMetricsByList(collect, "day");
         return new TagPowerMetricResponse(tagList, powerMetrics);
     }
 
@@ -218,11 +218,23 @@ public class KwhServiceImpl implements KwhService {
 
             Map<Instant, Double> sumByTimezone = getSumByTimezone(kwhList);
             List<Map.Entry<Instant, Double>> collect = getSortedByTimeList(sumByTimezone);
-            List<PowerMetric> powerMetrics = getPowerMetricsByList(collect);
+            List<PowerMetric> powerMetrics = getPowerMetricsByList(collect, "day");
             sensorPowerMetrics.add(new SensorPowerMetric(entry.getKey(), powerMetrics));
         }
 
         return sensorPowerMetrics;
+    }
+
+    @Override
+    public TagPowerMetricResponse getHourlyTotalData() {
+        String[] topics = getTopicAll();
+        List<Kwh> hourlyTotalData = kwhRepository.getHourlyTotalData(topics);
+
+        Map<Instant, Double> sumByTimezone = getSumByTimezone(hourlyTotalData);
+        List<Map.Entry<Instant, Double>> collect = getSortedByTimeList(sumByTimezone);
+        List<PowerMetric> powerMetrics = getPowerMetricsByList(collect, "hour");
+
+        return new TagPowerMetricResponse(List.of(), powerMetrics);
     }
 
 
@@ -270,7 +282,7 @@ public class KwhServiceImpl implements KwhService {
                 .collect(Collectors.toList());
     }
 
-    private List<PowerMetric> getPowerMetricsByList(List<Map.Entry<Instant, Double>> collect) {
+    private List<PowerMetric> getPowerMetricsByList(List<Map.Entry<Instant, Double>> collect, String unit) {
        List<PowerMetric> powerMetrics = new ArrayList<>();
 
         for (int i = collect.size()-1; i > 0; i--) {
@@ -278,7 +290,7 @@ public class KwhServiceImpl implements KwhService {
                     0,
                     new PowerMetric(
                             "kwh",
-                            "day",
+                            unit,
                             "1",
                             collect.get(i-1).getKey(),
                             collect.get(i).getValue() - collect.get(i - 1).getValue()
