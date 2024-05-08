@@ -18,9 +18,9 @@ public interface KwhRepository {
     List<Kwh> getWeekRaw(String[] topics);
     List<Kwh> get24Raw(String[] topics);
 
-    List<Kwh> getCurrentMonthStartData(String[] topics);
+    List<Kwh> getStartData(String[] topics, Instant start);
 
-    List<Kwh> getCurrentMonthEndData(String[] topics);
+    List<Kwh> getEndData(String[] topics, Instant start);
 
     List<Kwh> getWeekDataByHour(String[] topics);
 

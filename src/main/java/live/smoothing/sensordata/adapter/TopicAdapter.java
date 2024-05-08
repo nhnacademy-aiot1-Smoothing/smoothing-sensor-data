@@ -21,4 +21,7 @@ public interface TopicAdapter {
     SensorTopicResponse getSensorWithTopics(@RequestParam("tags") String tags,
                                             @RequestParam("type") String type,
                                             @RequestParam("userId") String userId);
+
+    @GetMapping("/api/device/topics/sensors/all")
+    SensorTopicResponse getSensorWithTopicAll(@RequestParam("type") String type);
 }
