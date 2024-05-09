@@ -15,6 +15,7 @@ import live.smoothing.sensordata.repository.KwhRepository;
 import live.smoothing.sensordata.service.KwhService;
 import live.smoothing.sensordata.util.TimeUtil;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
@@ -27,6 +28,7 @@ import java.util.stream.Collectors;
  *
  * @author 신민석, 박영준
  */
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class KwhServiceImpl implements KwhService {
@@ -45,43 +47,15 @@ public class KwhServiceImpl implements KwhService {
      */
     @Override
     public TagPowerMetricResponse get24HourData(String per, String tags) {
-
         String[] topics = getTopics(tags);
+        List<String> tagList = getTagList(tags);
 
-        List<Kwh> kwhList = kwhRepository.get24HourData(topics);
-        List<String> tagList = Arrays.stream(tags.split(",")).collect(Collectors.toList());
-        Map<Instant, Double> sumByTimezone = getSumByTimezone(kwhList);
-        List<Map.Entry<Instant, Double>> collect = getSortedByTimeList(sumByTimezone);
+        List<Kwh> aggList = kwhRepository.get24HourData(topics);
+        List<PowerMetric> metricList = createHourlyMetricList(aggList, "hour");
 
-        List<PowerMetric> metricList = new ArrayList<>();
-
-        for(int i = 0; i < collect.size()-1; i++) {
-            if(collect.get(i + 1) != null) {
-                PowerMetric powerMetric = new PowerMetric(
-                        "kwh",
-                        "hour",
-                        "1",
-                        collect.get(i).getKey(),
-                        collect.get(i + 1).getValue() - collect.get(i).getValue()
-                );
-
-                metricList.add(powerMetric);
-            }
-        }
-        List<Kwh> rawList = kwhRepository.get24Raw(topics);
-        Map<Instant, Double> rawSumByTimezone = getSumByTimezone(rawList);
-        List<Map.Entry<Instant, Double>> rawCollect = getSortedByTimeList(rawSumByTimezone);
-
-        PowerMetric powerMetric = new PowerMetric(
-                "kwh",
-                "hour",
-                "1",
-                rawCollect.get(0).getKey(),
-                rawCollect.get(rawCollect.size()-1).getValue() - rawCollect.get(0).getValue()
-        );
-
-        metricList.add(powerMetric);
+        addLastMetric(metricList, topics, "hour", "kwh");
         return new TagPowerMetricResponse(tagList, metricList);
+
     }
 
     /**
@@ -93,43 +67,32 @@ public class KwhServiceImpl implements KwhService {
      */
     @Override
     public TagPowerMetricResponse getWeekData(String per, String tags) {
-
         String[] topics = getTopics(tags);
+        log.error("topics: {}", topics);
 
-        List<Kwh> list = kwhRepository.getWeekData(topics);
-        List<String> tagList = Arrays.stream(tags.split(",")).collect(Collectors.toList());
-        Map<Instant, Double> sumByTimezone = getSumByTimezone(list);
-        List<Map.Entry<Instant, Double>> collect = getSortedByTimeList(sumByTimezone);
+        List<String> tagList = getTagList(tags);
 
-        List<PowerMetric> metricList = new ArrayList<>();
+        List<Kwh> weekAggList = kwhRepository.getAggregationWeekData(topics);
 
-        for(int i=0; i < collect.size()-1; i++) {
-            if(collect.get(i + 1) != null) {
-                PowerMetric powerMetric = new PowerMetric(
-                        "kwh",
-                        "day",
-                        "1",
-                        collect.get(i).getKey(),
-                        collect.get(i+1).getValue() - collect.get(i).getValue()
-                );
+        List<Kwh> firstRawList = kwhRepository.getWeekFirstRaw(topics);
+        List<Kwh> lastRawList = kwhRepository.getWeekLastRaw(topics);
 
-                metricList.add(powerMetric);
-            }
-        }
+        Double firstSum = sumValues(firstRawList);
+        Double lastSum = sumValues(lastRawList);
+        log.error("firstSum: {}", firstSum);
+        log.error("lastSum: {}", lastSum);
 
-        List<Kwh> rawList = kwhRepository.getWeekRaw(topics);
-        Map<Instant, Double> rawSumByTimezone = getSumByTimezone(rawList);
-        List<Map.Entry<Instant, Double>> rawCollect = getSortedByTimeList(rawSumByTimezone);
+        List<PowerMetric> metricList = createDailyMetricList(weekAggList, "day");
 
-        PowerMetric powerMetric = new PowerMetric(
+        PowerMetric lastMetric = new PowerMetric(
                 "kwh",
                 "day",
                 "1",
-                rawCollect.get(0).getKey(),
-                rawCollect.get(rawCollect.size()-1).getValue() - rawCollect.get(0).getValue()
-        );
+                TimeUtil.getRecentDay(Instant.now()).plus(9, ChronoUnit.HOURS),
+                lastSum - firstSum
 
-        metricList.add(powerMetric);
+        );
+        metricList.add(lastMetric);
 
         return new TagPowerMetricResponse(tagList, metricList);
     }
@@ -286,14 +249,9 @@ public class KwhServiceImpl implements KwhService {
         return new TagPowerMetricResponse(List.of(), powerMetrics);
     }
 
+    private List<String> getTagList(String tags) {
 
-    /**
-     * Kwh 리스트의 처음과 끝의 값을 빼서 차이를 반환
-     * @param list 처음과 끝의 차이를 구할 Kwh 리스트
-     * @return 처음과 끝의 차이
-     */
-    private double getGap(List<Kwh> list) {
-        return list.get(list.size() - 1).getValue() - list.get(0).getValue();
+        return Arrays.stream(tags.split(",")).collect(Collectors.toList());
     }
 
     private String[] getTopics(String tags) {
@@ -349,4 +307,71 @@ public class KwhServiceImpl implements KwhService {
 
         return powerMetrics;
     }
+
+    /**
+     * 시간별 메트릭 리스트 생성
+     */
+    private List<PowerMetric> createHourlyMetricList(List<Kwh> aggregationList, String interval) {
+        return createMetricList(aggregationList, interval);
+    }
+
+    /**
+     * 일별 메트릭 리스트 생성
+     */
+    private List<PowerMetric> createDailyMetricList(List<Kwh> aggregationList, String interval) {
+        return createMetricList(aggregationList, interval);
+    }
+
+    /**
+     * 메트릭 리스트 생성
+     */
+    private List<PowerMetric> createMetricList(List<Kwh> aggregationList, String interval) {
+        List<PowerMetric> metricList = new ArrayList<>();
+        List<Map.Entry<Instant, Double>> sortedEntries = getSortedEntriesByTime(aggregationList);
+
+        for (int i = 0; i < sortedEntries.size() - 1; i++) {
+            Instant currentKey = sortedEntries.get(i).getKey();
+            double diff = sortedEntries.get(i + 1).getValue() - sortedEntries.get(i).getValue();
+
+            PowerMetric powerMetric = new PowerMetric("kwh", interval, "1", currentKey, diff);
+            metricList.add(powerMetric);
+        }
+        return metricList;
+    }
+
+    /**
+     * 마지막 메트릭 추가
+     */
+    private void addLastMetric(List<PowerMetric> metricList, String[] topics, String interval, String unit) {
+        List<Kwh> firstRaw = interval.equals("day") ? kwhRepository.getWeekFirstRaw(topics) : kwhRepository.get24FirstRaw(topics);
+        List<Kwh> lastRaw = interval.equals("day") ? kwhRepository.getWeekLastRaw(topics) : kwhRepository.get24LastRaw(topics);
+
+        double firstValue = firstRaw.stream().mapToDouble(Kwh::getValue).sum();
+        double lastValue = lastRaw.stream().mapToDouble(Kwh::getValue).sum();
+        double diff = lastValue - firstValue;
+
+        PowerMetric lastMetric = new PowerMetric(unit, interval, "1", TimeUtil.getRecentHour(Instant.now()), diff);
+        metricList.add(lastMetric);
+    }
+
+    /**
+     * 시간별 합계 구하기
+     */
+    private List<Map.Entry<Instant, Double>> getSortedEntriesByTime(List<Kwh> aggregationList) {
+        Map<Instant, Double> sumByTimezone = aggregationList.stream()
+                .collect(Collectors.groupingBy(Kwh::getTime, Collectors.summingDouble(Kwh::getValue)));
+        return sumByTimezone.entrySet().stream()
+                .sorted(Map.Entry.comparingByKey())
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * 리스트의 합계 계산
+     */
+    private double sumValues(List<Kwh> kwhList) {
+        return kwhList.stream()
+                .mapToDouble(Kwh::getValue)
+                .sum();
+    }
+
 }
