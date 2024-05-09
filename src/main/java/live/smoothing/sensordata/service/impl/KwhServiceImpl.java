@@ -350,7 +350,7 @@ public class KwhServiceImpl implements KwhService {
         double lastValue = lastRaw.stream().mapToDouble(Kwh::getValue).sum();
         double diff = lastValue - firstValue;
 
-        PowerMetric lastMetric = new PowerMetric(unit, interval, "1", TimeUtil.getRecentHour(Instant.now()), diff);
+        PowerMetric lastMetric = new PowerMetric(unit, interval, "1", TimeUtil.getRecentHour(Instant.now().plus(9, ChronoUnit.HOURS)), diff);
         metricList.add(lastMetric);
     }
 
