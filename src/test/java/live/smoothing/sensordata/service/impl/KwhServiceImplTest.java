@@ -63,7 +63,7 @@ class KwhServiceImplTest {
     void rawDataTest() {
 
         KwhRepositoryImpl kwhRepository = new KwhRepositoryImpl(client.rawInfluxClient(), client.aggregationInfluxClient(), timeProvider);
-        List<Kwh> rawList = kwhRepository.get24Raw(testTopic);
+        List<Kwh> rawList = kwhRepository.get24FirstRaw(testTopic);
         System.out.println("size: " + rawList.size());
 
         for(int i = 0; i < rawList.size(); i++) {
