@@ -7,8 +7,6 @@ import java.time.temporal.TemporalAdjusters;
 /**
  * 시간 관련 유틸리티 클래스
  *
- * 해당 시간들은 모두 UTC 시간에 맞춰서 반환된다.
- *
  * @author 박영준
  */
 public class TimeUtil {
