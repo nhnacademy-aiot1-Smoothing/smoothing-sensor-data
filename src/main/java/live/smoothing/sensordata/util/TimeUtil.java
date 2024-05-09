@@ -16,19 +16,13 @@ public class TimeUtil {
     private TimeUtil() {}
 
     /**
-     * 단위 기준 최근 시간을 반환한다.
+     * 가장 최근 시간을 반환한다.
      *
      * @param source 기준 시간
-     * @param offset 정각 기준 시간 단위
      * @return 시간
      */
-    public static Instant getRecentHour(Instant source, long offset) {
-        int hourOfDay = source.atZone(ZoneId.systemDefault()).getHour();
-        long truncatedHour = hourOfDay / offset * offset;
-
-        return source.truncatedTo(ChronoUnit.DAYS)
-                .plus(truncatedHour, ChronoUnit.HOURS)
-                .minus(9L, ChronoUnit.HOURS);
+    public static Instant getRecentHour(Instant source) {
+        return source.truncatedTo(ChronoUnit.HOURS);
     }
 
     /**
@@ -47,15 +41,13 @@ public class TimeUtil {
     }
 
     /**
-     * 단위 기준 최근 월을 반환한다.
+     * 가장 최근 월을 반환한다.
      *
      * @param source 기준 시간
-     * @param offset 정각 기준 월 단위
      * @return 시간
      */
-    public static Instant getRecentMonth(Instant source, int offset) {
+    public static Instant getRecentMonth(Instant source) {
         return ZonedDateTime.ofInstant(source, ZoneId.systemDefault())
-                .minusMonths(offset-1)
                 .with(TemporalAdjusters.firstDayOfMonth())
                 .truncatedTo(ChronoUnit.DAYS).toInstant();
     }

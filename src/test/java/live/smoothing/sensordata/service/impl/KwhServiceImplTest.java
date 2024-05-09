@@ -63,7 +63,7 @@ class KwhServiceImplTest {
     void rawDataTest() {
 
         KwhRepositoryImpl kwhRepository = new KwhRepositoryImpl(client.rawInfluxClient(), client.aggregationInfluxClient(), timeProvider);
-        List<Kwh> rawList = kwhRepository.get24Raw(testTopic);
+        List<Kwh> rawList = kwhRepository.get24FirstRaw(testTopic);
         System.out.println("size: " + rawList.size());
 
         for(int i = 0; i < rawList.size(); i++) {
@@ -98,8 +98,8 @@ class KwhServiceImplTest {
 
         KwhRepositoryImpl kwhRepository = new KwhRepositoryImpl(client.rawInfluxClient(), client.aggregationInfluxClient(), timeProvider);
 
-        List<Kwh> startDataList = kwhRepository.getCurrentMonthStartData(testTopic);
-        List<Kwh> endDataList = kwhRepository.getCurrentMonthEndData(testTopic);
+        List<Kwh> startDataList = kwhRepository.getStartData(testTopic, Instant.now().minus(1, ChronoUnit.HOURS));
+        List<Kwh> endDataList = kwhRepository.getEndData(testTopic, Instant.now().minus(1, ChronoUnit.HOURS));
 
         for (Kwh kwh : endDataList) result += kwh.getValue();
         for (Kwh kwh : startDataList) result -= kwh.getValue();

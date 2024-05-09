@@ -59,13 +59,12 @@ public class KwhRepositoryImpl implements KwhRepository {
      * @return 집계된 Kwh의 리스트를 반환
      */
     @Override
-    public List<Kwh> getWeekData(String[] topics) {
+    public List<Kwh> getAggregationWeekData(String[] topics) {
         Flux query =
                 getKwhFromStart(
                         AGGREGATION_BUCKET,
                         "kwh_daily4",
-                        timeProvider.nowInstant()
-                                .minus(7, ChronoUnit.DAYS),
+                        timeProvider.nowInstant().minus(7, ChronoUnit.DAYS),
                         timeProvider.nowInstant(),
                         topics
                 );
@@ -74,19 +73,31 @@ public class KwhRepositoryImpl implements KwhRepository {
     }
 
     /**
-     * InfluxDB에 저장된 데이터를 조회하여 24시간 동안의 데이터를 반환(raw 데이터)
+     * InfluxDB에 저장된 Raw데이터를 조회하여 집계되지 않은 데이터를 반환
      *
      * @param topics 조회할 topic의 이름들
      * @return 원시 Kwh의 리스트를 반환
      */
     @Override
-    public List<Kwh> get24Raw(String[] topics) {
-
+    public List<Kwh> get24LastRaw(String[] topics) {
         Flux query =
                 getLastKwhFromStart(
                         RAW_BUCKET,
                         "mqtt_consumer",
-                        TimeUtil.getRecentHour(timeProvider.nowInstant(), 1),
+                        Instant.now().minus(1, ChronoUnit.HOURS),
+                        topics
+                );
+
+        return rawInfluxClient.getQueryApi().query(query.toString(), Kwh.class);
+    }
+
+    @Override
+    public List<Kwh> get24FirstRaw(String[] topics) {
+        Flux query =
+                getFirstKwhFromStart(
+                        RAW_BUCKET,
+                        "mqtt_consumer",
+                        TimeUtil.getRecentHour(timeProvider.nowInstant()),
                         topics
                 );
 
@@ -100,12 +111,12 @@ public class KwhRepositoryImpl implements KwhRepository {
      * @return 현재 달의 처음 값 리스트
      */
     @Override
-    public List<Kwh> getCurrentMonthStartData(String[] topics) {
+    public List<Kwh> getStartData(String[] topics, Instant start) {
 
         Flux firstQuery = getFirstKwhFromStart(
                 RAW_BUCKET,
                 "mqtt_consumer",
-                TimeUtil.getRecentMonth(timeProvider.nowInstant(), 1),
+                start,
                 topics
         );
 
@@ -119,12 +130,12 @@ public class KwhRepositoryImpl implements KwhRepository {
      * @return 현재 달의 끝 값 리스트
      */
     @Override
-    public List<Kwh> getCurrentMonthEndData(String[] topics) {
+    public List<Kwh> getEndData(String[] topics, Instant start) {
 
         Flux lastQuery = getLastKwhFromStart(
                 RAW_BUCKET,
                 "mqtt_consumer",
-                TimeUtil.getRecentMonth(timeProvider.nowInstant(), 1),
+                start,
                 topics
         );
 
@@ -158,7 +169,19 @@ public class KwhRepositoryImpl implements KwhRepository {
                         topics
                 );
 
-        System.out.println(query);
+        return aggregationInfluxClient.getQueryApi().query(query.toString(), Kwh.class);
+    }
+
+    @Override
+    public List<Kwh> getHourlyTotalData(String[] topics) {
+        Flux query =
+                getKwhFromStart(
+                        AGGREGATION_BUCKET,
+                        "kwh_hour",
+                        Instant.ofEpochMilli(0),
+                        timeProvider.nowInstant(),
+                        topics
+                );
 
         return aggregationInfluxClient.getQueryApi().query(query.toString(), Kwh.class);
     }
@@ -170,17 +193,30 @@ public class KwhRepositoryImpl implements KwhRepository {
      * @return 원시 Kwh의 리스트를 반환
      */
     @Override
-    public List<Kwh> getWeekRaw(String[] topics) {
+    public List<Kwh> getWeekFirstRaw(String[] topics) {
 
         Flux query =
-                getKwhFromStart(
-                        AGGREGATION_BUCKET,
-                        "kwh_daily4",
-                        timeProvider.nowInstant().minus(1L, ChronoUnit.DAYS),
-                        timeProvider.nowInstant(),
+                getFirstKwhFromStart(
+                        RAW_BUCKET,
+                        "mqtt_consumer",
+                        TimeUtil.getRecentDay(timeProvider.nowInstant()),
                         topics
                 );
 
-        return aggregationInfluxClient.getQueryApi().query(query.toString(), Kwh.class);
+        return rawInfluxClient.getQueryApi().query(query.toString(), Kwh.class);
     }
+
+    @Override
+    public List<Kwh> getWeekLastRaw(String[] topics) {
+        Flux query =
+                getLastKwhFromStart(
+                        RAW_BUCKET,
+                        "mqtt_consumer",
+                        Instant.now().minus(1, ChronoUnit.DAYS),
+                        topics
+                );
+
+        return rawInfluxClient.getQueryApi().query(query.toString(), Kwh.class);
+    }
+
 }

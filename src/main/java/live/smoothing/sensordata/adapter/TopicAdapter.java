@@ -10,15 +10,16 @@ import org.springframework.web.bind.annotation.RequestParam;
 public interface TopicAdapter {
 
     @GetMapping("/api/device/topics")
-    TopicResponse getTopicWithTopics(@RequestParam("tags") String tags,
-                                     @RequestParam("type") String type,
-                                     @RequestParam("userId") String userId);
+    TopicResponse getTopicWithTags(@RequestParam("tags") String tags,
+                                   @RequestParam("type") String type,
+                                   @RequestParam("userId") String userId);
 
     @GetMapping("/api/device/topics/all")
     TopicResponse getTopicAll(@RequestParam("type") String type);
 
-    @GetMapping("/api/device/topics/sensor")
+    @GetMapping("/api/device/topics/sensors")
     SensorTopicResponse getSensorWithTopics(@RequestParam("tags") String tags,
                                             @RequestParam("type") String type,
                                             @RequestParam("userId") String userId);
+
 }
