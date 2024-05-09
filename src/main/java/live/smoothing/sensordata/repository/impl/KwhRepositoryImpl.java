@@ -111,12 +111,12 @@ public class KwhRepositoryImpl implements KwhRepository {
      * @return 현재 달의 처음과 끝 값 리스트
      */
     @Override
-    public List<Kwh> getCurrentMonthStartData(String[] topics) {
+    public List<Kwh> getStartData(String[] topics, Instant start) {
 
         Flux firstQuery = getFirstKwhFromStart(
                 RAW_BUCKET,
                 "mqtt_consumer",
-                TimeUtil.getRecentMonth(timeProvider.nowInstant()),
+                start,
                 topics
         );
 
@@ -124,12 +124,12 @@ public class KwhRepositoryImpl implements KwhRepository {
     }
 
     @Override
-    public List<Kwh> getCurrentMonthEndData(String[] topics) {
+    public List<Kwh> getEndData(String[] topics, Instant start) {
 
         Flux lastQuery = getLastKwhFromStart(
                 RAW_BUCKET,
                 "mqtt_consumer",
-                TimeUtil.getRecentMonth(timeProvider.nowInstant()),
+                start,
                 topics
         );
 

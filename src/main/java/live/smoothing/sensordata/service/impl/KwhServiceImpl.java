@@ -1,11 +1,12 @@
 package live.smoothing.sensordata.service.impl;
 
 import live.smoothing.sensordata.adapter.TopicAdapter;
+import live.smoothing.sensordata.dto.PowerMetric;
 import live.smoothing.sensordata.dto.SensorPowerMetric;
+import live.smoothing.sensordata.dto.TagPowerMetricResponse;
 import live.smoothing.sensordata.dto.ThreadLocalUserId;
 import live.smoothing.sensordata.dto.kwh.KwhTimeZoneResponse;
-import live.smoothing.sensordata.dto.PowerMetric;
-import live.smoothing.sensordata.dto.TagPowerMetricResponse;
+import live.smoothing.sensordata.dto.kwh.TagSensorValue;
 import live.smoothing.sensordata.dto.topic.SensorTopicResponse;
 import live.smoothing.sensordata.dto.topic.SensorWithTopic;
 import live.smoothing.sensordata.dto.topic.TopicResponse;
@@ -104,8 +105,8 @@ public class KwhServiceImpl implements KwhService {
         TopicResponse topicAll = topicAdapter.getTopicAll(TOPIC_TYPE_NAME);
         String[] topics = topicAll.getTopics().toArray(new String[0]);
 
-        List<Kwh> startDataList = kwhRepository.getCurrentMonthStartData(topics);
-        List<Kwh> endDataList = kwhRepository.getCurrentMonthEndData(topics);
+        List<Kwh> startDataList = kwhRepository.getStartData(topics, TimeUtil.getRecentMonth(Instant.now()));
+        List<Kwh> endDataList = kwhRepository.getEndData(topics, TimeUtil.getRecentHour(Instant.now()).minus(1, ChronoUnit.HOURS));
 
         for (Kwh kwh : endDataList) result += kwh.getValue();
         for (Kwh kwh : startDataList) result -= kwh.getValue();
@@ -159,15 +160,21 @@ public class KwhServiceImpl implements KwhService {
     @Override
     public List<SensorPowerMetric> getDailyDataByPeriod(Instant start, Instant end, String tags) {
         String userId = ThreadLocalUserId.getUserId();
-        SensorTopicResponse sensorWithTopics = topicAdapter.getSensorWithTopics(tags, TOPIC_TYPE_NAME, userId);
-        String[] topics = sensorWithTopics.getSensorWithTopics().stream()
+        SensorTopicResponse sensorTopicResponse;
+        if (tags.isEmpty()) {
+            sensorTopicResponse = topicAdapter.getSensorWithTopicAll(TOPIC_TYPE_NAME);
+        } else {
+            sensorTopicResponse = topicAdapter.getSensorWithTopics(tags, TOPIC_TYPE_NAME, userId);
+        }
+
+        String[] topics = sensorTopicResponse.getSensorWithTopics().stream()
                 .map(SensorWithTopic::getTopic)
                 .toArray(String[]::new);
 
         Map<String, String> topicSensorNameMap = new HashMap<>();
         Map<String, List<Kwh>> sensorNameKwhMap = new HashMap<>();
 
-        for (SensorWithTopic sensorWithTopic : sensorWithTopics.getSensorWithTopics()) {
+        for (SensorWithTopic sensorWithTopic : sensorTopicResponse.getSensorWithTopics()) {
             topicSensorNameMap.put(sensorWithTopic.getTopic(), sensorWithTopic.getSensorName());
             sensorNameKwhMap.put(sensorWithTopic.getSensorName(), new ArrayList<>());
         }
@@ -188,6 +195,46 @@ public class KwhServiceImpl implements KwhService {
         }
 
         return sensorPowerMetrics;
+    }
+
+    @Override
+    public List<TagSensorValue> getTotalSesnorData(String tags, Instant start, Instant end) {
+        String userId = ThreadLocalUserId.getUserId();
+        SensorTopicResponse sensorTopicResponse;
+        if (tags.isEmpty()) {
+            sensorTopicResponse = topicAdapter.getSensorWithTopicAll(TOPIC_TYPE_NAME);
+        } else {
+            sensorTopicResponse = topicAdapter.getSensorWithTopics(tags, TOPIC_TYPE_NAME, userId);
+        }
+
+        String[] topics = sensorTopicResponse.getSensorWithTopics().stream()
+                .map(SensorWithTopic::getTopic)
+                .toArray(String[]::new);
+
+        Map<String, String> topicSensorNameMap = new HashMap<>();
+        Map<String, Double> sensorValueMap = new HashMap<>();
+
+        for (SensorWithTopic sensorWithTopic : sensorTopicResponse.getSensorWithTopics()) {
+            topicSensorNameMap.put(sensorWithTopic.getTopic(), sensorWithTopic.getSensorName());
+            sensorValueMap.put(sensorWithTopic.getSensorName(), 0.0);
+        }
+
+        List<Kwh> startData = kwhRepository.getStartData(topics, start);
+        List<Kwh> endData = kwhRepository.getEndData(topics, Instant.now().minus(1, ChronoUnit.HOURS));
+
+        for (Kwh kwh : endData) {
+            sensorValueMap.put(topicSensorNameMap.get(kwh.getTopic()),
+                    sensorValueMap.get(topicSensorNameMap.get(kwh.getTopic())) + kwh.getValue());
+        }
+
+        for (Kwh kwh : startData) {
+            sensorValueMap.put(topicSensorNameMap.get(kwh.getTopic()),
+                    sensorValueMap.get(topicSensorNameMap.get(kwh.getTopic())) - kwh.getValue());
+        }
+
+        return sensorValueMap.entrySet().stream()
+                .map(entry -> new TagSensorValue(entry.getKey(), entry.getValue()))
+                .collect(Collectors.toList());
     }
 
     @Override

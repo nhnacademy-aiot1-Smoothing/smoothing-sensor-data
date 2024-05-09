@@ -6,6 +6,7 @@ import live.smoothing.sensordata.dto.SensorPowerMetricResponse;
 import live.smoothing.sensordata.dto.TagPowerMetricResponse;
 import live.smoothing.sensordata.dto.TimeZoneResponse;
 import live.smoothing.sensordata.dto.kwh.KwhTimeZoneResponse;
+import live.smoothing.sensordata.dto.kwh.TagSensorValueResponse;
 import live.smoothing.sensordata.service.KwhService;
 import live.smoothing.sensordata.util.TimeUtil;
 import lombok.RequiredArgsConstructor;
@@ -73,6 +74,22 @@ public class KwhController {
 
         List<SensorPowerMetric> dailyDataByPeriod = kwhService.getDailyDataByPeriod(startInstant, endInstant, tags);
         return new SensorPowerMetricResponse(dailyDataByPeriod);
+    }
+
+    @GetMapping("/daily/value/total")
+    public TagSensorValueResponse getDailyTotalSensorData(@RequestParam String tags) {
+        Instant start = Instant.now().minus(24, ChronoUnit.HOURS);
+        Instant end = Instant.now().minus(1, ChronoUnit.HOURS);
+
+        return new TagSensorValueResponse(kwhService.getTotalSesnorData(tags, start, end));
+    }
+
+    @GetMapping("/weekly/value/total")
+    public TagSensorValueResponse getWeeklyTotalSensorData(@RequestParam String tags) {
+        Instant start = Instant.now().minus(7, ChronoUnit.DAYS);
+        Instant end = Instant.now().minus(1, ChronoUnit.HOURS);
+
+        return new TagSensorValueResponse(kwhService.getTotalSesnorData(tags, start, end));
     }
 
     @GetMapping("/hourly/total")
