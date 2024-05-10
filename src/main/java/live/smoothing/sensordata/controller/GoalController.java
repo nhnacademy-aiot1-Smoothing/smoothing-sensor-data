@@ -41,7 +41,11 @@ public class GoalController {
     @GetMapping("/history")
     public List<GoalHistoryResponse> getGoalHistory(@RequestParam(defaultValue = "1") Integer year) {
 
-        return goalService.getGoalHistory(year);
+        List<GoalHistoryResponse> goalHistory = goalService.getGoalHistory(year);
+        Double currentMonthKwh = kwhService.getCurrentMonthKwh();
+        goalHistory.get(goalHistory.size()-1).setAmount(currentMonthKwh);
+
+        return goalHistory;
     }
 
     @GetMapping("/kwh")
