@@ -22,6 +22,6 @@ public class CostController {
         GoalResponse goalResponse = goalService.getGoal();
         Double currentMonthKwh = kwhService.getCurrentMonthKwh();
 
-        return new CostResponse(goalResponse.getUnitPrice() * currentMonthKwh);
+        return new CostResponse((int)Math.round(goalResponse.getUnitPrice() * currentMonthKwh));
     }
 }
