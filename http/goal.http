@@ -4,6 +4,6 @@ X-USER-ID: haha
 Content-Type: application/json
 
 {
-  "goalAmount": 1200,
-  "unitPrice": 100
+  "goalAmount": 6000,
+  "unitPrice": 1500
 }

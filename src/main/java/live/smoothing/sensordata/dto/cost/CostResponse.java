@@ -9,5 +9,5 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class CostResponse {
 
-    private Double cost;
+    private Integer cost;
 }
