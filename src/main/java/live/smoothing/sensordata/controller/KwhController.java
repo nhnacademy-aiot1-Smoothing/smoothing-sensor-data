@@ -35,9 +35,9 @@ public class KwhController {
                                          @RequestParam String tags) {
 
         if(unit.equals("hour") && per.equals(1)) {
-            return kwhService.get24HourData(per.toString(), tags);
+            return kwhService.get48HourData(per.toString(), tags);
         } else if(unit.equals("day") && per.equals(1)) {
-            return kwhService.getWeekData(per.toString(), tags);
+            return kwhService.get2WeekData(per.toString(), tags);
         }
 
         throw new CommonException(HttpStatus.NOT_FOUND, "Not Found");
