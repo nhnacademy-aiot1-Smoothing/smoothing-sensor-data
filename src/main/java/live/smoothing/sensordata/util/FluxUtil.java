@@ -21,6 +21,7 @@ public class FluxUtil {
     private static final String COLUMN_KEY = "_field";
     private static final String COLUMN_VALUE = "_value";
     private static final String FUNCTION = "({ r with value: float(v: r.value)})";
+    private static final String COLUMN_TOPIC = "topic";
 
     /**
      * InfluxDB Flux 쿼리를 생성한다.
@@ -117,9 +118,9 @@ public class FluxUtil {
     }
 
     public static Flux getAggregationWattFromStart(String bucketName,
-                                               String measurementName,
-                                               Instant start,
-                                               String[] topics
+                                                   String measurementName,
+                                                   Instant start,
+                                                   String[] topics
     ) {
         Restrictions orRestrictions = getOrRestrictions(topics);
 

@@ -6,6 +6,7 @@ import live.smoothing.sensordata.dto.SensorPowerMetricResponse;
 import live.smoothing.sensordata.dto.TagPowerMetricResponse;
 import live.smoothing.sensordata.dto.TimeZoneResponse;
 import live.smoothing.sensordata.dto.kwh.KwhTimeZoneResponse;
+import live.smoothing.sensordata.dto.kwh.TagSensorValueResponse;
 import live.smoothing.sensordata.service.KwhService;
 import live.smoothing.sensordata.util.TimeUtil;
 import lombok.RequiredArgsConstructor;
@@ -29,15 +30,14 @@ public class KwhController {
     private final KwhService kwhService;
 
     @GetMapping
-    public TagPowerMetricResponse getKwh(@RequestParam String type,
-                                         @RequestParam String unit,
+    public TagPowerMetricResponse getKwh(@RequestParam String unit,
                                          @RequestParam Integer per,
                                          @RequestParam String tags) {
 
         if(unit.equals("hour") && per.equals(1)) {
-            return kwhService.get24HourData(type, unit, per.toString(), tags);
+            return kwhService.get48HourData(per.toString(), tags);
         } else if(unit.equals("day") && per.equals(1)) {
-            return kwhService.getWeekData(type, unit, per.toString(), tags);
+            return kwhService.get2WeekData(per.toString(), tags);
         }
 
         throw new CommonException(HttpStatus.NOT_FOUND, "Not Found");
@@ -74,5 +74,26 @@ public class KwhController {
 
         List<SensorPowerMetric> dailyDataByPeriod = kwhService.getDailyDataByPeriod(startInstant, endInstant, tags);
         return new SensorPowerMetricResponse(dailyDataByPeriod);
+    }
+
+    @GetMapping("/daily/value/total")
+    public TagSensorValueResponse getDailyTotalSensorData(@RequestParam String tags) {
+        Instant start = Instant.now().minus(24, ChronoUnit.HOURS);
+        Instant end = Instant.now().minus(1, ChronoUnit.HOURS);
+
+        return new TagSensorValueResponse(kwhService.getTotalSesnorData(tags, start, end));
+    }
+
+    @GetMapping("/weekly/value/total")
+    public TagSensorValueResponse getWeeklyTotalSensorData(@RequestParam String tags) {
+        Instant start = Instant.now().minus(7, ChronoUnit.DAYS);
+        Instant end = Instant.now().minus(1, ChronoUnit.HOURS);
+
+        return new TagSensorValueResponse(kwhService.getTotalSesnorData(tags, start, end));
+    }
+
+    @GetMapping("/hourly/total")
+    public TagPowerMetricResponse getHourlyTotalData() {
+        return kwhService.getHourlyTotalData();
     }
 }

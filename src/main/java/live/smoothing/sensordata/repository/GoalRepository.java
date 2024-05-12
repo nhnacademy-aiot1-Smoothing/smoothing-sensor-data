@@ -10,6 +10,6 @@ public interface GoalRepository extends JpaRepository<Goal, String> {
 
     Goal findFirstByOrderByGoalDateDesc();
 
-    @Query("select g from Goal g where year(g.goalDate) = ?1")
+    @Query("select g from Goal g where year(g.goalDate) = ?1 order by g.goalDate")
     List<Goal> findAllByYear(Integer year);
 }

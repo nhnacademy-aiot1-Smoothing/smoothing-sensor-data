@@ -1,21 +1,25 @@
 package live.smoothing.sensordata.service.impl;
 
 import live.smoothing.sensordata.adapter.TopicAdapter;
+import live.smoothing.sensordata.dto.PowerMetric;
 import live.smoothing.sensordata.dto.SensorPowerMetric;
+import live.smoothing.sensordata.dto.TagPowerMetricResponse;
 import live.smoothing.sensordata.dto.ThreadLocalUserId;
 import live.smoothing.sensordata.dto.kwh.KwhTimeZoneResponse;
-import live.smoothing.sensordata.dto.PowerMetric;
-import live.smoothing.sensordata.dto.TagPowerMetricResponse;
+import live.smoothing.sensordata.dto.kwh.TagSensorValue;
 import live.smoothing.sensordata.dto.topic.SensorTopicResponse;
 import live.smoothing.sensordata.dto.topic.SensorWithTopic;
 import live.smoothing.sensordata.dto.topic.TopicResponse;
 import live.smoothing.sensordata.entity.Kwh;
 import live.smoothing.sensordata.repository.KwhRepository;
 import live.smoothing.sensordata.service.KwhService;
+import live.smoothing.sensordata.util.TimeUtil;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -24,6 +28,7 @@ import java.util.stream.Collectors;
  *
  * @author 신민석, 박영준
  */
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class KwhServiceImpl implements KwhService {
@@ -34,89 +39,42 @@ public class KwhServiceImpl implements KwhService {
     private final TopicAdapter topicAdapter;
 
     /**
-     * 24시간 동안의 데이터를 조회하여 반환
+     * 최근 24시간 동안의 데이터를 조회하여 반환
      *
-     * @param type 조회할 데이터의 타입
-     * @param unit 조회할 데이터의 단위
      * @param per 조회할 데이터의 주기
      * @param tags 조회할 데이터의 태그
      * @return PowerMetricResponse
      */
     @Override
-    public TagPowerMetricResponse get24HourData(String type, String unit, String per, String tags) {
-
+    public TagPowerMetricResponse get48HourData(String per, String tags) {
         String[] topics = getTopics(tags);
-        List<Kwh> kwhList = kwhRepository.get24HourData(topics);
-        List<PowerMetric> metricList = new ArrayList<>();
+        List<String> tagList = getTagList(tags);
 
-        for(int i = 0; i < kwhList.size() - 1; i++) {
-            if(kwhList.get(i + 1) != null) {
-                PowerMetric powerMetric = new PowerMetric(
-                        "kwh",
-                        "hour",
-                        "1",
-                        kwhList.get(i).getTime(),
-                        getGap(kwhList)
-                );
+        List<Kwh> aggList = kwhRepository.get48HourData(topics);
+        List<PowerMetric> metricList = createHourlyMetricList(aggList, "hour");
 
-                metricList.add(powerMetric);
-            }
-        }
-        List<Kwh> rawList = kwhRepository.get24Raw(topics);
-
-        PowerMetric powerMetric = new PowerMetric(
-                "kwh",
-                "hour",
-                "1",
-                rawList.get(0).getTime(),
-                getGap(rawList)
-        );
-
-        metricList.add(powerMetric);
-        return new TagPowerMetricResponse(List.of(tags), metricList);
+        addLastMetric(metricList, topics, "hour", "kwh");
+        return new TagPowerMetricResponse(tagList, metricList);
     }
 
     /**
      * 7일 동안의 데이터를 조회하여 반환
      *
-     * @param type 조회할 데이터의 타입
-     * @param unit 조회할 데이터의 단위
      * @param per 조회할 데이터의 주기
      * @param tags 조회할 데이터의 태그
      * @return PowerMetricResponse
      */
     @Override
-    public TagPowerMetricResponse getWeekData(String type, String unit, String per, String tags) {
+    public TagPowerMetricResponse get2WeekData(String per, String tags) {
 
         String[] topics = getTopics(tags);
-        List<Kwh> list = kwhRepository.getWeekData(topics);
-        List<PowerMetric> metricList = new ArrayList<>();
+        List<String> tagList = getTagList(tags);
 
-        for(int i=0; i < list.size()-1; i++) {
-            if(list.get(i + 1) != null) {
-                PowerMetric powerMetric = new PowerMetric(
-                        "kwh",
-                        "day",
-                        "1",
-                        list.get(i).getTime(),
-                        getGap(list)
-                );
+        List<Kwh> weekAggList = kwhRepository.getAggregation2WeekData(topics);
+        List<PowerMetric> metricList = createDailyMetricList(weekAggList, "day");
+        addLastMetric(metricList, topics, "day", "kwh");
 
-                metricList.add(powerMetric);
-            }
-        }
-        List<Kwh> rawList = kwhRepository.getWeekRaw(topics);
-        PowerMetric powerMetric = new PowerMetric(
-                "kwh",
-                "day",
-                "1",
-                rawList.get(0).getTime(),
-                getGap(rawList)
-        );
-
-        metricList.add(powerMetric);
-
-        return new TagPowerMetricResponse(List.of(tags), metricList);
+        return new TagPowerMetricResponse(tagList, metricList);
     }
 
     @Override
@@ -127,8 +85,8 @@ public class KwhServiceImpl implements KwhService {
         TopicResponse topicAll = topicAdapter.getTopicAll(TOPIC_TYPE_NAME);
         String[] topics = topicAll.getTopics().toArray(new String[0]);
 
-        List<Kwh> startDataList = kwhRepository.getCurrentMonthStartData(topics);
-        List<Kwh> endDataList = kwhRepository.getCurrentMonthEndData(topics);
+        List<Kwh> startDataList = kwhRepository.getStartData(topics, TimeUtil.getRecentMonth(Instant.now()));
+        List<Kwh> endDataList = kwhRepository.getEndData(topics, TimeUtil.getRecentHour(Instant.now()).minus(30, ChronoUnit.MINUTES));
 
         for (Kwh kwh : endDataList) result += kwh.getValue();
         for (Kwh kwh : startDataList) result -= kwh.getValue();
@@ -175,22 +133,28 @@ public class KwhServiceImpl implements KwhService {
 
         Map<Instant, Double> sumByTimezone = getSumByTimezone(weekDataByPeriod);
         List<Map.Entry<Instant, Double>> collect = getSortedByTimeList(sumByTimezone);
-        List<PowerMetric> powerMetrics = getPowerMetricsByList(collect);
+        List<PowerMetric> powerMetrics = getPowerMetricsByList(collect, "day");
         return new TagPowerMetricResponse(tagList, powerMetrics);
     }
 
     @Override
     public List<SensorPowerMetric> getDailyDataByPeriod(Instant start, Instant end, String tags) {
         String userId = ThreadLocalUserId.getUserId();
-        SensorTopicResponse sensorWithTopics = topicAdapter.getSensorWithTopics(tags, TOPIC_TYPE_NAME, userId);
-        String[] topics = sensorWithTopics.getSensorWithTopics().stream()
+        SensorTopicResponse sensorTopicResponse;
+        if (tags.isEmpty()) {
+            sensorTopicResponse = topicAdapter.getSensorWithTopicAll(TOPIC_TYPE_NAME);
+        } else {
+            sensorTopicResponse = topicAdapter.getSensorWithTopics(tags, TOPIC_TYPE_NAME, userId);
+        }
+
+        String[] topics = sensorTopicResponse.getSensorWithTopics().stream()
                 .map(SensorWithTopic::getTopic)
                 .toArray(String[]::new);
 
         Map<String, String> topicSensorNameMap = new HashMap<>();
         Map<String, List<Kwh>> sensorNameKwhMap = new HashMap<>();
 
-        for (SensorWithTopic sensorWithTopic : sensorWithTopics.getSensorWithTopics()) {
+        for (SensorWithTopic sensorWithTopic : sensorTopicResponse.getSensorWithTopics()) {
             topicSensorNameMap.put(sensorWithTopic.getTopic(), sensorWithTopic.getSensorName());
             sensorNameKwhMap.put(sensorWithTopic.getSensorName(), new ArrayList<>());
         }
@@ -206,21 +170,68 @@ public class KwhServiceImpl implements KwhService {
 
             Map<Instant, Double> sumByTimezone = getSumByTimezone(kwhList);
             List<Map.Entry<Instant, Double>> collect = getSortedByTimeList(sumByTimezone);
-            List<PowerMetric> powerMetrics = getPowerMetricsByList(collect);
+            List<PowerMetric> powerMetrics = getPowerMetricsByList(collect, "day");
             sensorPowerMetrics.add(new SensorPowerMetric(entry.getKey(), powerMetrics));
         }
 
         return sensorPowerMetrics;
     }
 
+    @Override
+    public List<TagSensorValue> getTotalSesnorData(String tags, Instant start, Instant end) {
+        String userId = ThreadLocalUserId.getUserId();
+        SensorTopicResponse sensorTopicResponse;
+        if (tags.isEmpty()) {
+            sensorTopicResponse = topicAdapter.getSensorWithTopicAll(TOPIC_TYPE_NAME);
+        } else {
+            sensorTopicResponse = topicAdapter.getSensorWithTopics(tags, TOPIC_TYPE_NAME, userId);
+        }
 
-    /**
-     * Kwh 리스트의 처음과 끝의 값을 빼서 차이를 반환
-     * @param list 처음과 끝의 차이를 구할 Kwh 리스트
-     * @return 처음과 끝의 차이
-     */
-    private double getGap(List<Kwh> list) {
-        return list.get(list.size() - 1).getValue() - list.get(0).getValue();
+        String[] topics = sensorTopicResponse.getSensorWithTopics().stream()
+                .map(SensorWithTopic::getTopic)
+                .toArray(String[]::new);
+
+        Map<String, String> topicSensorNameMap = new HashMap<>();
+        Map<String, Double> sensorValueMap = new HashMap<>();
+
+        for (SensorWithTopic sensorWithTopic : sensorTopicResponse.getSensorWithTopics()) {
+            topicSensorNameMap.put(sensorWithTopic.getTopic(), sensorWithTopic.getSensorName());
+            sensorValueMap.put(sensorWithTopic.getSensorName(), 0.0);
+        }
+
+        List<Kwh> startData = kwhRepository.getStartData(topics, start);
+        List<Kwh> endData = kwhRepository.getEndData(topics, Instant.now().minus(1, ChronoUnit.HOURS));
+
+        for (Kwh kwh : endData) {
+            sensorValueMap.put(topicSensorNameMap.get(kwh.getTopic()),
+                    sensorValueMap.get(topicSensorNameMap.get(kwh.getTopic())) + kwh.getValue());
+        }
+
+        for (Kwh kwh : startData) {
+            sensorValueMap.put(topicSensorNameMap.get(kwh.getTopic()),
+                    sensorValueMap.get(topicSensorNameMap.get(kwh.getTopic())) - kwh.getValue());
+        }
+
+        return sensorValueMap.entrySet().stream()
+                .map(entry -> new TagSensorValue(entry.getKey(), entry.getValue()))
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public TagPowerMetricResponse getHourlyTotalData() {
+        String[] topics = getTopicAll();
+        List<Kwh> hourlyTotalData = kwhRepository.getHourlyTotalData(topics);
+
+        Map<Instant, Double> sumByTimezone = getSumByTimezone(hourlyTotalData);
+        List<Map.Entry<Instant, Double>> collect = getSortedByTimeList(sumByTimezone);
+        List<PowerMetric> powerMetrics = getPowerMetricsByList(collect, "hour");
+
+        return new TagPowerMetricResponse(List.of(), powerMetrics);
+    }
+
+    private List<String> getTagList(String tags) {
+
+        return Arrays.stream(tags.split(",")).collect(Collectors.toList());
     }
 
     private String[] getTopics(String tags) {
@@ -258,7 +269,7 @@ public class KwhServiceImpl implements KwhService {
                 .collect(Collectors.toList());
     }
 
-    private List<PowerMetric> getPowerMetricsByList(List<Map.Entry<Instant, Double>> collect) {
+    private List<PowerMetric> getPowerMetricsByList(List<Map.Entry<Instant, Double>> collect, String unit) {
        List<PowerMetric> powerMetrics = new ArrayList<>();
 
         for (int i = collect.size()-1; i > 0; i--) {
@@ -266,7 +277,7 @@ public class KwhServiceImpl implements KwhService {
                     0,
                     new PowerMetric(
                             "kwh",
-                            "day",
+                            unit,
                             "1",
                             collect.get(i-1).getKey(),
                             collect.get(i).getValue() - collect.get(i - 1).getValue()
@@ -275,5 +286,79 @@ public class KwhServiceImpl implements KwhService {
         }
 
         return powerMetrics;
+    }
+
+    /**
+     * 시간별 메트릭 리스트 생성
+     */
+    private List<PowerMetric> createHourlyMetricList(List<Kwh> aggregationList, String interval) {
+        return createMetricList(aggregationList, interval);
+    }
+
+    /**
+     * 일별 메트릭 리스트 생성
+     */
+    private List<PowerMetric> createDailyMetricList(List<Kwh> aggregationList, String interval) {
+        return createMetricList(aggregationList, interval);
+    }
+
+    /**
+     * 메트릭 리스트 생성
+     */
+    private List<PowerMetric> createMetricList(List<Kwh> aggregationList, String interval) {
+        List<PowerMetric> metricList = new ArrayList<>();
+        List<Map.Entry<Instant, Double>> sortedEntries = getSortedEntriesByTime(aggregationList);
+
+        for (int i = 0; i < sortedEntries.size() - 1; i++) {
+            Instant currentKey = sortedEntries.get(i).getKey();
+            double diff = sortedEntries.get(i + 1).getValue() - sortedEntries.get(i).getValue();
+
+            PowerMetric powerMetric = new PowerMetric("kwh", interval, "1", currentKey, diff);
+            metricList.add(powerMetric);
+        }
+        return metricList;
+    }
+
+    /**
+     * 마지막 메트릭 추가
+     */
+    private void addLastMetric(List<PowerMetric> metricList, String[] topics, String interval, String unit) {
+        List<Kwh> firstRaw = interval.equals("day") ?
+                kwhRepository.getStartData(topics, TimeUtil.getRecentDay(Instant.now())) :
+                kwhRepository.getStartData(topics, TimeUtil.getRecentHour(Instant.now()));
+
+        List<Kwh> lastRaw = kwhRepository.getEndData(topics, TimeUtil.getRecentHour(Instant.now()));
+
+        double firstValue = firstRaw.stream().mapToDouble(Kwh::getValue).sum();
+        double lastValue = lastRaw.stream().mapToDouble(Kwh::getValue).sum();
+        double diff = lastValue - firstValue;
+
+        Instant offset = interval.equals("day") ?
+                TimeUtil.getRecentDay(Instant.now()).plus(9, ChronoUnit.HOURS) :
+                TimeUtil.getRecentHour(Instant.now()).plus(9, ChronoUnit.HOURS);
+
+        PowerMetric lastMetric = new PowerMetric(
+                unit,
+                interval,
+                "1",
+                offset,
+                diff);
+
+        metricList.add(lastMetric);
+    }
+
+    /**
+     * 시간별 합계 구하기
+     */
+    private List<Map.Entry<Instant, Double>> getSortedEntriesByTime(List<Kwh> aggregationList) {
+        Map<Instant, Double> sumByTimezone = aggregationList.stream()
+                .collect(Collectors.groupingBy(Kwh::getTime, Collectors.summingDouble(Kwh::getValue)));
+        return sumByTimezone.entrySet().stream()
+                .sorted(Map.Entry.comparingByKey())
+                .collect(Collectors.toList());
+    }
+
+    public static void main(String[] args) {
+        System.out.println(TimeUtil.getRecentDay(Instant.now()));
     }
 }
