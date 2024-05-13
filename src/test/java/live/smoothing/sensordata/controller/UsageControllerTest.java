@@ -54,8 +54,8 @@ class UsageControllerTest {
         given(usageService.getEnergyUsage(year, month, bizCd)).willReturn(expectedResponse);
 
         // when & then
-        mockMvc.perform(get("/api/external/usage")
-                        .header("X-USER-ID", "test")
+        mockMvc.perform(get("/api/sensor/external/usage")
+                        .header("X-USER-ID", "haha")
                         .param("year", String.valueOf(year))
                         .param("month", month)
                         .param("bizCd", bizCd)
@@ -82,7 +82,7 @@ class UsageControllerTest {
         given(usageService.getEnergyUsage(year, month, bizCd)).willReturn(null);
 
         // when & then
-        mockMvc.perform(get("/api/external/usage")
+        mockMvc.perform(get("/api/sensor/external/usage")
                         .header("X-USER-ID", "test")
                         .param("year", String.valueOf(year))
                         .param("month", month)
