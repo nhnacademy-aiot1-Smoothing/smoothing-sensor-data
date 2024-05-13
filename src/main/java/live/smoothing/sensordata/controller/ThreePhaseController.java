@@ -1,7 +1,6 @@
 package live.smoothing.sensordata.controller;
 
 import live.smoothing.sensordata.dto.phase.PhaseResponse;
-import live.smoothing.sensordata.dto.phase.ThreePhase;
 import live.smoothing.sensordata.service.ThreePhaseService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;

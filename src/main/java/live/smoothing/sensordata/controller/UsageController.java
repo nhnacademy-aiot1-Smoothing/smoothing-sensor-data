@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/api/external/usage")
+@RequestMapping("/api/sensor/external/usage")
 public class UsageController {
 
     private final UsageService usageService;
