@@ -55,8 +55,8 @@ class GoalRepositoryTest {
 
         // then
         assertAll(
-                () -> assertThat(findFirst.getGoalDate().getYear()).isEqualTo(2021),
-                () -> assertThat(findFirst.getGoalDate().getMonthValue()).isEqualTo(3)
+                () -> assertThat(findFirst.getGoalDate().getYear()).isEqualTo(2024),
+                () -> assertThat(findFirst.getGoalDate().getMonthValue()).isEqualTo(5)
         );
     }
 

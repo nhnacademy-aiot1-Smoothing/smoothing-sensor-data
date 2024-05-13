@@ -1,9 +1,9 @@
 package live.smoothing.sensordata.service.impl;
 
 import live.smoothing.sensordata.config.InfluxDBConfig;
+import live.smoothing.sensordata.dto.PowerMetric;
 import live.smoothing.sensordata.dto.SensorPowerMetric;
 import live.smoothing.sensordata.dto.kwh.KwhTimeZoneResponse;
-import live.smoothing.sensordata.dto.PowerMetric;
 import live.smoothing.sensordata.dto.topic.SensorTopicResponse;
 import live.smoothing.sensordata.dto.topic.SensorWithTopic;
 import live.smoothing.sensordata.entity.Kwh;
@@ -63,7 +63,7 @@ class KwhServiceImplTest {
     void rawDataTest() {
 
         KwhRepositoryImpl kwhRepository = new KwhRepositoryImpl(client.rawInfluxClient(), client.aggregationInfluxClient(), timeProvider);
-        List<Kwh> rawList = kwhRepository.get24FirstRaw(testTopic);
+        List<Kwh> rawList = kwhRepository.getStartData(testTopic, TimeUtil.getRecentHour(Instant.now()));
         System.out.println("size: " + rawList.size());
 
         for(int i = 0; i < rawList.size(); i++) {
@@ -80,7 +80,7 @@ class KwhServiceImplTest {
     void testGet24hours() {
         KwhRepositoryImpl kwhRepository = new KwhRepositoryImpl(client.rawInfluxClient(), client.aggregationInfluxClient(), timeProvider);
 
-        List<Kwh> kwhList = kwhRepository.get24HourData(testTopic);
+        List<Kwh> kwhList = kwhRepository.get48HourData(testTopic);
 
         for(int i = 0; i < kwhList.size(); i++) {
             System.out.println("place: " + kwhList.get(i).getPlace());

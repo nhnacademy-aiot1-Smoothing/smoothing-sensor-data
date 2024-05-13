@@ -46,16 +46,15 @@ public class KwhServiceImpl implements KwhService {
      * @return PowerMetricResponse
      */
     @Override
-    public TagPowerMetricResponse get24HourData(String per, String tags) {
+    public TagPowerMetricResponse get48HourData(String per, String tags) {
         String[] topics = getTopics(tags);
         List<String> tagList = getTagList(tags);
 
-        List<Kwh> aggList = kwhRepository.get24HourData(topics);
+        List<Kwh> aggList = kwhRepository.get48HourData(topics);
         List<PowerMetric> metricList = createHourlyMetricList(aggList, "hour");
 
         addLastMetric(metricList, topics, "hour", "kwh");
         return new TagPowerMetricResponse(tagList, metricList);
-
     }
 
     /**
@@ -66,33 +65,14 @@ public class KwhServiceImpl implements KwhService {
      * @return PowerMetricResponse
      */
     @Override
-    public TagPowerMetricResponse getWeekData(String per, String tags) {
-        String[] topics = getTopics(tags);
-        log.error("topics: {}", topics);
+    public TagPowerMetricResponse get2WeekData(String per, String tags) {
 
+        String[] topics = getTopics(tags);
         List<String> tagList = getTagList(tags);
 
-        List<Kwh> weekAggList = kwhRepository.getAggregationWeekData(topics);
-
-        List<Kwh> firstRawList = kwhRepository.getWeekFirstRaw(topics);
-        List<Kwh> lastRawList = kwhRepository.getWeekLastRaw(topics);
-
-        Double firstSum = sumValues(firstRawList);
-        Double lastSum = sumValues(lastRawList);
-        log.error("firstSum: {}", firstSum);
-        log.error("lastSum: {}", lastSum);
-
+        List<Kwh> weekAggList = kwhRepository.getAggregation2WeekData(topics);
         List<PowerMetric> metricList = createDailyMetricList(weekAggList, "day");
-
-        PowerMetric lastMetric = new PowerMetric(
-                "kwh",
-                "day",
-                "1",
-                TimeUtil.getRecentDay(Instant.now()).plus(9, ChronoUnit.HOURS),
-                lastSum - firstSum
-
-        );
-        metricList.add(lastMetric);
+        addLastMetric(metricList, topics, "day", "kwh");
 
         return new TagPowerMetricResponse(tagList, metricList);
     }
@@ -106,7 +86,7 @@ public class KwhServiceImpl implements KwhService {
         String[] topics = topicAll.getTopics().toArray(new String[0]);
 
         List<Kwh> startDataList = kwhRepository.getStartData(topics, TimeUtil.getRecentMonth(Instant.now()));
-        List<Kwh> endDataList = kwhRepository.getEndData(topics, TimeUtil.getRecentHour(Instant.now()).minus(1, ChronoUnit.HOURS));
+        List<Kwh> endDataList = kwhRepository.getEndData(topics, TimeUtil.getRecentHour(Instant.now()).minus(30, ChronoUnit.MINUTES));
 
         for (Kwh kwh : endDataList) result += kwh.getValue();
         for (Kwh kwh : startDataList) result -= kwh.getValue();
@@ -343,14 +323,27 @@ public class KwhServiceImpl implements KwhService {
      * 마지막 메트릭 추가
      */
     private void addLastMetric(List<PowerMetric> metricList, String[] topics, String interval, String unit) {
-        List<Kwh> firstRaw = interval.equals("day") ? kwhRepository.getWeekFirstRaw(topics) : kwhRepository.get24FirstRaw(topics);
-        List<Kwh> lastRaw = interval.equals("day") ? kwhRepository.getWeekLastRaw(topics) : kwhRepository.get24LastRaw(topics);
+        List<Kwh> firstRaw = interval.equals("day") ?
+                kwhRepository.getStartData(topics, TimeUtil.getRecentDay(Instant.now())) :
+                kwhRepository.getStartData(topics, TimeUtil.getRecentHour(Instant.now()));
+
+        List<Kwh> lastRaw = kwhRepository.getEndData(topics, TimeUtil.getRecentHour(Instant.now()));
 
         double firstValue = firstRaw.stream().mapToDouble(Kwh::getValue).sum();
         double lastValue = lastRaw.stream().mapToDouble(Kwh::getValue).sum();
         double diff = lastValue - firstValue;
 
-        PowerMetric lastMetric = new PowerMetric(unit, interval, "1", TimeUtil.getRecentHour(Instant.now().plus(9, ChronoUnit.HOURS)), diff);
+        Instant offset = interval.equals("day") ?
+                TimeUtil.getRecentDay(Instant.now()).plus(9, ChronoUnit.HOURS) :
+                TimeUtil.getRecentHour(Instant.now()).plus(9, ChronoUnit.HOURS);
+
+        PowerMetric lastMetric = new PowerMetric(
+                unit,
+                interval,
+                "1",
+                offset,
+                diff);
+
         metricList.add(lastMetric);
     }
 
@@ -365,13 +358,7 @@ public class KwhServiceImpl implements KwhService {
                 .collect(Collectors.toList());
     }
 
-    /**
-     * 리스트의 합계 계산
-     */
-    private double sumValues(List<Kwh> kwhList) {
-        return kwhList.stream()
-                .mapToDouble(Kwh::getValue)
-                .sum();
+    public static void main(String[] args) {
+        System.out.println(TimeUtil.getRecentDay(Instant.now()));
     }
-
 }

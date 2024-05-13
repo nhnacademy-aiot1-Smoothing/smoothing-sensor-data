@@ -121,6 +121,7 @@ class GoalControllerTest {
         );
 
         given(goalService.getGoalHistory(2021)).willReturn(goalHistoryResponses);
+        given(kwhService.getCurrentMonthKwh()).willReturn(100.0);
 
         // when
         // then
