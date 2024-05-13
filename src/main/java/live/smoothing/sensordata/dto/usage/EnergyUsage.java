@@ -1,8 +1,7 @@
 package live.smoothing.sensordata.dto.usage;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 /**
  * API 응답을 받는 DTO 클래스*
