@@ -10,6 +10,6 @@ import java.util.List;
 @Setter
 @AllArgsConstructor
 public class ThreePhase {
-    private List<Phase> top;
-    private List<Phase> bottom;
+    private Phase top;
+    private Phase bottom;
 }
