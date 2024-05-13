@@ -72,8 +72,8 @@ public class KwhServiceImpl implements KwhService {
 
         List<Kwh> weekAggList = kwhRepository.getAggregation2WeekData(topics);
         List<PowerMetric> metricList = createDailyMetricList(weekAggList, "day");
-        addLastMetric(metricList, topics, "day", "kwh");
 
+        addLastMetric(metricList, topics, "day", "kwh");
         return new TagPowerMetricResponse(tagList, metricList);
     }
 
@@ -327,11 +327,11 @@ public class KwhServiceImpl implements KwhService {
                 kwhRepository.getStartData(topics, TimeUtil.getRecentDay(Instant.now())) :
                 kwhRepository.getStartData(topics, TimeUtil.getRecentHour(Instant.now()));
 
-        List<Kwh> lastRaw = kwhRepository.getEndData(topics, TimeUtil.getRecentHour(Instant.now()));
+        List<Kwh> lastRaw = kwhRepository.getEndData(topics, Instant.now().minus(10, ChronoUnit.MINUTES));
 
         double firstValue = firstRaw.stream().mapToDouble(Kwh::getValue).sum();
         double lastValue = lastRaw.stream().mapToDouble(Kwh::getValue).sum();
-        double diff = lastValue - firstValue;
+        double diff = firstRaw.size() != lastRaw.size() ? 0 : lastValue - firstValue;
 
         Instant offset = interval.equals("day") ?
                 TimeUtil.getRecentDay(Instant.now()).plus(9, ChronoUnit.HOURS) :
