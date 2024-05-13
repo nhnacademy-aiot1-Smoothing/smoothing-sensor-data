@@ -327,7 +327,7 @@ public class KwhServiceImpl implements KwhService {
                 kwhRepository.getStartData(topics, TimeUtil.getRecentDay(Instant.now())) :
                 kwhRepository.getStartData(topics, TimeUtil.getRecentHour(Instant.now()));
 
-        List<Kwh> lastRaw = kwhRepository.getEndData(topics, Instant.now().minus(10, ChronoUnit.MINUTES));
+        List<Kwh> lastRaw = kwhRepository.getEndData(topics, Instant.now().minus(5, ChronoUnit.MINUTES));
 
         double firstValue = firstRaw.stream().mapToDouble(Kwh::getValue).sum();
         double lastValue = lastRaw.stream().mapToDouble(Kwh::getValue).sum();
