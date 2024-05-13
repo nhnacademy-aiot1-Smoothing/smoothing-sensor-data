@@ -6,5 +6,5 @@ import java.util.List;
 
 public interface ThreePhaseRepository {
 
-    List<Phase> getThreePhase(String[] topics);
+    Phase getThreePhase(String[] topics);
 }

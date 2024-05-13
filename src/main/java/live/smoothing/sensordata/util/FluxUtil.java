@@ -5,6 +5,8 @@ import com.influxdb.query.dsl.functions.restriction.Restrictions;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
+import java.util.Arrays;
+import java.util.stream.Collectors;
 
 import static com.influxdb.query.dsl.functions.restriction.Restrictions.measurement;
 
@@ -138,18 +140,13 @@ public class FluxUtil {
                                         String[] topics
                                         )
     {
-        Restrictions r = getOr(topics[0]);
+        Restrictions r = getOrRestrictions(topics);
 
         return Flux.from(bucketName)
                 .range(start)
                 .filter(Restrictions.measurement().equal(measurementName))
                 .filter(r)
-//                .pivot()
-//                .withRowKey(new String[]{ROW_KEY})
-//                .withColumnKey(new String[]{COLUMN_KEY})
-//                .withValueColumn(COLUMN_VALUE)
-//                .map("fn, (r) => ({ r with value: double(v: r._value) })")
-//                .map(FUNCTION)
+                .limit(1)
                 .timeShift(9L, ChronoUnit.HOURS);
     }
 
@@ -170,12 +167,7 @@ public class FluxUtil {
     }
 
     private static Restrictions getOr(String topics) {
-        Restrictions restrictions = Restrictions.tag("description").equal(topics);
-
-//        for (int i = 1; i < topics.length; i++) {
-//            restrictions = Restrictions.and(restrictions, Restrictions.tag("topic").equal(topics[i]));
-//        }
-
+        Restrictions restrictions = Restrictions.column("topic").equal(topics);
         return restrictions;
     }
 }

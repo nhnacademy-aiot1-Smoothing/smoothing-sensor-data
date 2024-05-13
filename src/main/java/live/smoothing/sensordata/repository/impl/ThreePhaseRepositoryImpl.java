@@ -26,23 +26,23 @@ public class ThreePhaseRepositoryImpl implements ThreePhaseRepository {
 
     //Todo: RAW 버킷에서 Three-Phase
     @Override
-    public List<Phase> getThreePhase(String[] topics) {
+    public Phase getThreePhase(String[] topics) {
 
         Flux query =
                 getRawThreePhase(
                         RAW_BUCKET,
                         "mqtt_consumer",
-                        Instant.now().minus(2, ChronoUnit.HOURS),
+                        Instant.now().minus(2, ChronoUnit.DAYS),
                         topics
                 );
 
+        List<Phase> phases = rawInfluxClient.getQueryApi().query(query.toString(), Phase.class);
+        log.error("size: {}", phases.size());
 
-//        System.out.println(query.toString());
-        List<Phase> asd = rawInfluxClient.getQueryApi().query(query.toString(), Phase.class);
-//        return rawInfluxClient.getQueryApi().query(query.toString(), Phase.class);
-        System.out.println("time: " + asd.get(0).getTime());
-        System.out.println("value: " + asd.get(0).getValue());
-        return asd;
+        if(phases.isEmpty()) {
+            return null;
+        }
+        return phases.get(0);
 
 
     }
