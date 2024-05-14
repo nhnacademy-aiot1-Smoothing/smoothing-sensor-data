@@ -12,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Objects;
 
 @RestController
 @RequestMapping("/api/sensor/goals")
@@ -42,8 +43,10 @@ public class GoalController {
     public List<GoalHistoryResponse> getGoalHistory(@RequestParam(defaultValue = "1") Integer year) {
 
         List<GoalHistoryResponse> goalHistory = goalService.getGoalHistory(year);
-        Double currentMonthKwh = kwhService.getCurrentMonthKwh();
-        goalHistory.get(goalHistory.size()-1).setAmount(currentMonthKwh);
+        if (Objects.isNull(goalHistory.get(goalHistory.size()-1).getAmount())) {
+            Double currentMonthKwh = kwhService.getCurrentMonthKwh();
+            goalHistory.get(goalHistory.size()-1).setAmount(currentMonthKwh);
+        }
 
         return goalHistory;
     }
