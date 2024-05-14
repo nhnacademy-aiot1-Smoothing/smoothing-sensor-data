@@ -5,6 +5,8 @@ import com.influxdb.query.dsl.functions.restriction.Restrictions;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
+import java.util.Arrays;
+import java.util.stream.Collectors;
 
 import static com.influxdb.query.dsl.functions.restriction.Restrictions.measurement;
 
@@ -22,7 +24,8 @@ public class FluxUtil {
     private static final String COLUMN_VALUE = "_value";
     private static final String FUNCTION = "({ r with value: float(v: r.value)})";
     private static final String COLUMN_TOPIC = "topic";
-
+    // "fn: (r) => ({ r with value: float(v: r._value) })"
+    // "({ r with value: float(v: r.value)})"
     /**
      * InfluxDB Flux 쿼리를 생성한다.
      *
@@ -131,6 +134,22 @@ public class FluxUtil {
                 .timeShift(9L, ChronoUnit.HOURS);
     }
 
+    public static Flux getRawThreePhase(String bucketName,
+                                        String measurementName,
+                                        Instant start,
+                                        String[] topics
+                                        )
+    {
+        Restrictions r = getOrRestrictions(topics);
+
+        return Flux.from(bucketName)
+                .range(start)
+                .filter(Restrictions.measurement().equal(measurementName))
+                .filter(r)
+                .limit(1)
+                .timeShift(9L, ChronoUnit.HOURS);
+    }
+
     /**
      * 토픽을 OR 연산으로 연결하는 Restrictions를 생성한다.
      *
@@ -144,6 +163,11 @@ public class FluxUtil {
             restrictions = Restrictions.or(restrictions, Restrictions.tag("topic").equal(topics[i]));
         }
 
+        return restrictions;
+    }
+
+    private static Restrictions getOr(String topics) {
+        Restrictions restrictions = Restrictions.column("topic").equal(topics);
         return restrictions;
     }
 }

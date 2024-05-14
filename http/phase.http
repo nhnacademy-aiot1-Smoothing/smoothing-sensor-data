@@ -1,0 +1,2 @@
+GET http://localhost:8009/api/sensor/three-phase
+X-USER-ID: haha
