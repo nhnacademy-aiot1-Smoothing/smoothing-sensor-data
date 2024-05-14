@@ -10,7 +10,6 @@ import lombok.Setter;
 @AllArgsConstructor
 public class PhaseResponse {
 
-    ThreePhase first;
-    ThreePhase second;
-    ThreePhase third;
+    ThreePhase classA;
+    ThreePhase office;
 }

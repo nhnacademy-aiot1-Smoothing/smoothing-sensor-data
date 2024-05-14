@@ -15,22 +15,21 @@ import org.springframework.stereotype.Service;
 public class ThreePhaseServiceImpl implements ThreePhaseService {
 
     private final ThreePhaseRepository phaseRepository;
-
+    private final String CLASS_LL = "data/s/nhnacademy/b/gyeongnam/p/class_a/d/gems-3500/e/electrical_energy/t/voltage/ph/total/de/v123_ll_average";
+    private final String CLASS_LN = "data/s/nhnacademy/b/gyeongnam/p/class_a/d/gems-3500/e/electrical_energy/t/voltage/ph/total/de/v123_ln_average";
+    private final String OFFICE_LL = "data/s/nhnacademy/b/gyeongnam/p/office/d/gems-3500/e/electrical_energy/t/voltage/ph/total/de/v123_ll_average";
+    private final String OFFICE_LN = "data/s/nhnacademy/b/gyeongnam/p/office/d/gems-3500/e/electrical_energy/t/voltage/ph/total/de/v123_ln_average";
     @Override
     public PhaseResponse getThreePhase() {
-        Phase v1 =  phaseRepository.getThreePhase(new String[]{"data/s/nhnacademy/b/gyeongnam/p/class_a/d/gems-3500/e/electrical_energy/t/voltage/ph/1/de/v1"});
-        Phase v12 =  phaseRepository.getThreePhase(new String[]{"data/s/nhnacademy/b/gyeongnam/p/class_a/d/gems-3500/e/electrical_energy/t/voltage/ph/1/de/v12"});
-        ThreePhase v = new ThreePhase(v1, v12);
+        Phase class_ll =  phaseRepository.getThreePhase(new String[]{CLASS_LL});
+        Phase class_ln =  phaseRepository.getThreePhase(new String[]{CLASS_LN});
+        ThreePhase classA = new ThreePhase(class_ll, class_ln);
 
-        Phase v2 = phaseRepository.getThreePhase(new String[]{"data/s/nhnacademy/b/gyeongnam/p/class_a/d/gems-3500/e/electrical_energy/t/voltage/ph/2/de/v2"});
-        Phase v23 = phaseRepository.getThreePhase(new String[]{"data/s/nhnacademy/b/gyeongnam/p/class_a/d/gems-3500/e/electrical_energy/t/voltage/ph/2/de/v23"});
-        ThreePhase vv = new ThreePhase(v2, v23);
+        Phase office_ll = phaseRepository.getThreePhase(new String[]{OFFICE_LL});
+        Phase office_ln = phaseRepository.getThreePhase(new String[]{OFFICE_LN});
+        ThreePhase office = new ThreePhase(office_ll, office_ln);
 
-        Phase v3 = phaseRepository.getThreePhase(new String[]{"data/s/nhnacademy/b/gyeongnam/p/class_a/d/gems-3500/e/electrical_energy/t/voltage/ph/3/de/v3"});
-        Phase v31 = phaseRepository.getThreePhase(new String[]{"data/s/nhnacademy/b/gyeongnam/p/class_a/d/gems-3500/e/electrical_energy/t/voltage/ph/3/de/v31"});
-        ThreePhase vvv = new ThreePhase(v3, v31);
-
-        PhaseResponse resp = new PhaseResponse(v, vv, vvv);
+        PhaseResponse resp = new PhaseResponse(classA, office);
 
         return resp;
     }
