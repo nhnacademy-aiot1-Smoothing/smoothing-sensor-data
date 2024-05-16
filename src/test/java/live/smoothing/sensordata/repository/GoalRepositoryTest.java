@@ -47,16 +47,16 @@ class GoalRepositoryTest {
     }
 
     @Test
-    @DisplayName("가장 최근 튜플을 가지고 온다.")
+    @DisplayName("지정한 연도와 월에 해당하는 목표를 가지고온다.")
     void findFirstByOrderByGoalDateDesc() {
         // given
         // when
-        Goal findFirst = goalRepository.findFirstByOrderByGoalDateDesc();
+        Goal findFirst = goalRepository.findByYearAndMonth(2021, 3);
 
         // then
         assertAll(
-                () -> assertThat(findFirst.getGoalDate().getYear()).isEqualTo(2024),
-                () -> assertThat(findFirst.getGoalDate().getMonthValue()).isEqualTo(5)
+                () -> assertThat(findFirst.getGoalDate().getYear()).isEqualTo(2021),
+                () -> assertThat(findFirst.getGoalDate().getMonthValue()).isEqualTo(3)
         );
     }
 

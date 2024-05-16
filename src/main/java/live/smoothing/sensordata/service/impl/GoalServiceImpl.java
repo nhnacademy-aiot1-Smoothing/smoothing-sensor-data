@@ -24,8 +24,8 @@ public class GoalServiceImpl implements GoalService {
 
     @Override
     public GoalResponse getGoal() {
-
-        Goal findGoal = goalRepository.findFirstByOrderByGoalDateDesc();
+        LocalDateTime now = timeProvider.now();
+        Goal findGoal = goalRepository.findByYearAndMonth(now.getYear(), now.getMonthValue());
         return new GoalResponse(findGoal.getGoalAmount(), findGoal.getUnitPrice());
     }
 
@@ -58,8 +58,8 @@ public class GoalServiceImpl implements GoalService {
 
     @Override
     public void modifyGoal(GoalRequest goalRequest) {
-
-        Goal goal = goalRepository.findFirstByOrderByGoalDateDesc();
+        LocalDateTime now = timeProvider.now();
+        Goal goal = goalRepository.findByYearAndMonth(now.getYear(), now.getMonthValue());
 
         goal.setGoalAmount(goalRequest.getGoalAmount());
         goal.setUnitPrice(goalRequest.getUnitPrice());
@@ -69,8 +69,8 @@ public class GoalServiceImpl implements GoalService {
 
     @Override
     public boolean existsByGoalDate() {
-
-        Goal findGoal = goalRepository.findFirstByOrderByGoalDateDesc();
+        LocalDateTime now = timeProvider.now();
+        Goal findGoal = goalRepository.findByYearAndMonth(now.getYear(), now.getMonthValue());
 
         return Objects.nonNull(findGoal)
                 && findGoal.getGoalDate().getYear() == timeProvider.now().getYear()

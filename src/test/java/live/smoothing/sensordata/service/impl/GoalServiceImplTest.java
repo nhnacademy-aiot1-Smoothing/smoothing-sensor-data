@@ -46,13 +46,13 @@ class GoalServiceImplTest {
                 .unitPrice(300)
                 .build();
 
-        when(goalRepository.findFirstByOrderByGoalDateDesc()).thenReturn(goal);
+        when(goalRepository.findByYearAndMonth(anyInt(), anyInt())).thenReturn(goal);
 
         // when
         GoalResponse response = goalService.getGoal();
 
         // then
-        verify(goalRepository, times(1)).findFirstByOrderByGoalDateDesc();
+        verify(goalRepository, times(1)).findByYearAndMonth(anyInt(), anyInt());
 
         Assertions.assertAll(
                 () -> assertThat(response.getGoalAmount()).isEqualTo(goal.getGoalAmount()),
@@ -96,13 +96,13 @@ class GoalServiceImplTest {
     @DisplayName("해당 월에 목표가 존재하지 않으면 false를 반환한다.")
     void notExistGoalReturnFalse() {
         // given
-        when(goalRepository.findFirstByOrderByGoalDateDesc()).thenReturn(null);
+        when(goalRepository.findByYearAndMonth(anyInt(), anyInt())).thenReturn(null);
 
         // when
         boolean result = goalService.existsByGoalDate();
 
         // then
-        verify(goalRepository, times(1)).findFirstByOrderByGoalDateDesc();
+        verify(goalRepository, times(1)).findByYearAndMonth(anyInt(), anyInt());
 
         assertThat(result).isFalse();
     }
@@ -117,7 +117,7 @@ class GoalServiceImplTest {
                 .unitPrice(300)
                 .build();
 
-        when(goalRepository.findFirstByOrderByGoalDateDesc()).thenReturn(goal);
+        when(goalRepository.findByYearAndMonth(anyInt(), anyInt())).thenReturn(goal);
 
         // when
         boolean result = goalService.existsByGoalDate();
@@ -136,7 +136,7 @@ class GoalServiceImplTest {
                 .unitPrice(300)
                 .build();
 
-        when(goalRepository.findFirstByOrderByGoalDateDesc()).thenReturn(goal);
+        when(goalRepository.findByYearAndMonth(anyInt(), anyInt())).thenReturn(goal);
 
         // when
         boolean result = goalService.existsByGoalDate();
@@ -155,7 +155,7 @@ class GoalServiceImplTest {
                 .unitPrice(300)
                 .build();
 
-        when(goalRepository.findFirstByOrderByGoalDateDesc()).thenReturn(goal);
+        when(goalRepository.findByYearAndMonth(anyInt(), anyInt())).thenReturn(goal);
 
         // when
         boolean result = goalService.existsByGoalDate();
