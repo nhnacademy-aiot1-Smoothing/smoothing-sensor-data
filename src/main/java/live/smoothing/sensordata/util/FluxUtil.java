@@ -47,6 +47,7 @@ public class FluxUtil {
                 .range(start, end)
                 .filter(measurement().equal(measurementName))
                 .filter(orRestrictions)
+                .groupBy("topic")
                 .pivot()
                 .withRowKey(new String[]{ROW_KEY})
                 .withColumnKey(new String[]{COLUMN_KEY})
@@ -75,6 +76,7 @@ public class FluxUtil {
                 .range(start)
                 .filter(measurement().equal(measurementName))
                 .filter(orRestrictions)
+                .groupBy("topic")
                 .first()
                 .timeShift(9L, ChronoUnit.HOURS);
     }
@@ -100,6 +102,7 @@ public class FluxUtil {
                 .filter(measurement().equal(measurementName))
                 .filter(orRestrictions)
                 .map("({ r with _time: time(v: now())})")
+                .groupBy("topic")
                 .last()
                 .timeShift(9L, ChronoUnit.HOURS);
     }
@@ -115,6 +118,7 @@ public class FluxUtil {
                 .range(start)
                 .filter(Restrictions.measurement().equal(measurementName))
                 .filter(orRestrictions)
+                .groupBy("topic")
                 .sum()
                 .map("({ r with _time: time(v: now())})")
                 .timeShift(9L, ChronoUnit.HOURS);
@@ -131,6 +135,7 @@ public class FluxUtil {
                 .range(start)
                 .filter(Restrictions.measurement().equal(measurementName))
                 .filter(orRestrictions)
+                .groupBy("topic")
                 .timeShift(9L, ChronoUnit.HOURS);
     }
 
@@ -146,6 +151,7 @@ public class FluxUtil {
                 .range(start)
                 .filter(Restrictions.measurement().equal(measurementName))
                 .filter(r)
+                .groupBy("topic")
                 .limit(1)
                 .timeShift(9L, ChronoUnit.HOURS);
     }
