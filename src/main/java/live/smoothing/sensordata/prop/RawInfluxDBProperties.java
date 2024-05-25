@@ -13,5 +13,4 @@ public class RawInfluxDBProperties {
     private String url;
     private String token;
     private String org;
-    private String bucket;
 }
