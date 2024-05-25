@@ -23,18 +23,13 @@ public class GoalController {
     private final KwhService kwhService;
 
     @GetMapping
-    public GoalResponse getGoalData() {
-
+    public GoalResponse getGoal() {
         return goalService.getGoal();
     }
 
-    @PostMapping
-    public ResponseEntity<Void> saveGoal(@RequestBody GoalRequest goalRequest) {
-        if (goalService.existsByGoalDate()) {
-            goalService.modifyGoal(goalRequest);
-        } else {
-            goalService.saveGoal(goalRequest);
-        }
+    @PutMapping
+    public ResponseEntity<Void> modifyGoal(@RequestBody GoalRequest goalRequest) {
+        goalService.modifyGoal(goalRequest);
 
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
@@ -43,6 +38,7 @@ public class GoalController {
     public List<GoalHistoryResponse> getGoalHistory(@RequestParam(defaultValue = "1") Integer year) {
 
         List<GoalHistoryResponse> goalHistory = goalService.getGoalHistory(year);
+
         if (Objects.isNull(goalHistory.get(goalHistory.size()-1).getAmount())) {
             Double currentMonthKwh = kwhService.getCurrentMonthKwh();
             goalHistory.get(goalHistory.size()-1).setAmount(currentMonthKwh);
