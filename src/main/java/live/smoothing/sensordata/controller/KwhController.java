@@ -1,14 +1,12 @@
 package live.smoothing.sensordata.controller;
 
-import live.smoothing.common.exception.CommonException;
-import live.smoothing.sensordata.dto.SensorPowerMetric;
 import live.smoothing.sensordata.dto.SensorPowerMetricResponse;
 import live.smoothing.sensordata.dto.TagPowerMetricResponse;
 import live.smoothing.sensordata.dto.TimeZoneResponse;
-import live.smoothing.sensordata.dto.kwh.KwhTimeZoneResponse;
 import live.smoothing.sensordata.dto.kwh.TagSensorValueResponse;
+import live.smoothing.sensordata.exception.NotFoundServletException;
 import live.smoothing.sensordata.service.KwhService;
-import live.smoothing.sensordata.util.TimeUtil;
+import live.smoothing.sensordata.util.UTCTimeUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -20,7 +18,6 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.time.temporal.ChronoUnit;
-import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -35,18 +32,17 @@ public class KwhController {
                                          @RequestParam String tags) {
 
         if(unit.equals("hour") && per.equals(1)) {
-            return kwhService.get48HourData(per.toString(), tags);
+            return kwhService.get48HourData(tags);
         } else if(unit.equals("day") && per.equals(1)) {
-            return kwhService.get2WeekData(per.toString(), tags);
+            return kwhService.get2WeekData(tags);
         }
 
-        throw new CommonException(HttpStatus.NOT_FOUND, "Not Found");
+        throw new NotFoundServletException(HttpStatus.NOT_FOUND, "요청을 처리할 수 없습니다.");
     }
 
     @GetMapping("/weekly/timezone")
     public TimeZoneResponse getWeeklyDataByTimeOfDay() {
-        List<KwhTimeZoneResponse> weeklyDataByTimeOfDay = kwhService.getWeeklyDataByTimeOfDay();
-        return new TimeZoneResponse(weeklyDataByTimeOfDay);
+        return  kwhService.getWeeklyDataByTimeOfDay();
     }
 
     @GetMapping("/daily/period/total")
@@ -54,10 +50,9 @@ public class KwhController {
                                                             @RequestParam LocalDateTime end,
                                                             @RequestParam String tags) {
 
-        Instant startInstant = TimeUtil.getRecentDay(start.toInstant(ZoneOffset.UTC));
-        Instant endInstant = TimeUtil.getRecentDay(end.toInstant(ZoneOffset.UTC))
-                .plus(1, ChronoUnit.DAYS)
-                .plus(30, ChronoUnit.MINUTES);
+        Instant startInstant = UTCTimeUtil.getRecentDay(start.toInstant(ZoneOffset.UTC));
+        Instant endInstant = UTCTimeUtil.getRecentDay(end.toInstant(ZoneOffset.UTC))
+                .plus(1, ChronoUnit.DAYS);
 
         return kwhService.getDailyTotalDataByPeriod(startInstant, endInstant, tags);
     }
@@ -67,29 +62,27 @@ public class KwhController {
                                                           @RequestParam LocalDateTime end,
                                                           @RequestParam String tags) {
 
-        Instant startInstant = TimeUtil.getRecentDay(start.toInstant(ZoneOffset.UTC));
-        Instant endInstant = TimeUtil.getRecentDay(end.toInstant(ZoneOffset.UTC))
-                .plus(1, ChronoUnit.DAYS)
-                .plus(30, ChronoUnit.MINUTES);
+        Instant startInstant = UTCTimeUtil.getRecentDay(start.toInstant(ZoneOffset.UTC));
+        Instant endInstant = UTCTimeUtil.getRecentDay(end.toInstant(ZoneOffset.UTC))
+                .plus(1, ChronoUnit.DAYS);
 
-        List<SensorPowerMetric> dailyDataByPeriod = kwhService.getDailyDataByPeriod(startInstant, endInstant, tags);
-        return new SensorPowerMetricResponse(dailyDataByPeriod);
+        return kwhService.getDailySensorDataByPeriod(startInstant, endInstant, tags);
     }
 
     @GetMapping("/daily/value/total")
     public TagSensorValueResponse getDailyTotalSensorData(@RequestParam String tags) {
         Instant start = Instant.now().minus(24, ChronoUnit.HOURS);
-        Instant end = Instant.now().minus(1, ChronoUnit.HOURS);
+        Instant end = Instant.now().minus(30, ChronoUnit.MINUTES);
 
-        return new TagSensorValueResponse(kwhService.getTotalSesnorData(tags, start, end));
+        return kwhService.getTotalSensorData(tags, start, end);
     }
 
     @GetMapping("/weekly/value/total")
     public TagSensorValueResponse getWeeklyTotalSensorData(@RequestParam String tags) {
         Instant start = Instant.now().minus(7, ChronoUnit.DAYS);
-        Instant end = Instant.now().minus(1, ChronoUnit.HOURS);
+        Instant end = Instant.now().minus(30, ChronoUnit.MINUTES);
 
-        return new TagSensorValueResponse(kwhService.getTotalSesnorData(tags, start, end));
+        return kwhService.getTotalSensorData(tags, start, end);
     }
 
     @GetMapping("/hourly/total")
