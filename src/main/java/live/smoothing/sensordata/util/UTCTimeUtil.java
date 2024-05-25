@@ -11,6 +11,8 @@ import java.time.temporal.TemporalAdjusters;
  */
 public class UTCTimeUtil {
 
+    private static final ZoneId KST_ZONE_ID = ZoneId.of("Asia/Seoul");
+
     private UTCTimeUtil() {}
 
     /**
@@ -21,11 +23,13 @@ public class UTCTimeUtil {
      * @return 시간
      */
     public static Instant getRecentMinute(Instant source, long offset) {
-        int minuteOfHour = source.atZone(ZoneId.systemDefault()).getMinute();
+        int minuteOfHour = source.atZone(KST_ZONE_ID).getMinute();
         long truncatedMinute = minuteOfHour / offset * offset;
 
-        return source.truncatedTo(ChronoUnit.HOURS)
-                .plus(truncatedMinute, ChronoUnit.MINUTES);
+        return source.atZone(KST_ZONE_ID)
+                .truncatedTo(ChronoUnit.HOURS)
+                .plus(truncatedMinute, ChronoUnit.MINUTES)
+                .toInstant();
     }
 
     /**
@@ -35,7 +39,7 @@ public class UTCTimeUtil {
      * @return 시간
      */
     public static Instant getRecentHour(Instant source) {
-        return source.truncatedTo(ChronoUnit.HOURS);
+        return source.atZone(KST_ZONE_ID).truncatedTo(ChronoUnit.HOURS).toInstant();
     }
 
     /**
@@ -45,10 +49,9 @@ public class UTCTimeUtil {
      * @return 시간
      */
     public static Instant getRecentDay(Instant source) {
-        return source
-                .plus(9L, ChronoUnit.HOURS)
+        return source.atZone(KST_ZONE_ID)
                 .truncatedTo(ChronoUnit.DAYS)
-                .minus(9L, ChronoUnit.HOURS);
+                .toInstant();
     }
 
     /**
@@ -58,7 +61,7 @@ public class UTCTimeUtil {
      * @return 시간
      */
     public static Instant getRecentMonth(Instant source) {
-        return ZonedDateTime.ofInstant(source, ZoneId.systemDefault())
+        return ZonedDateTime.ofInstant(source, KST_ZONE_ID)
                 .with(TemporalAdjusters.firstDayOfMonth())
                 .truncatedTo(ChronoUnit.DAYS).toInstant();
     }
