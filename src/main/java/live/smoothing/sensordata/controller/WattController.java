@@ -1,7 +1,7 @@
 package live.smoothing.sensordata.controller;
 
-import live.smoothing.common.exception.CommonException;
 import live.smoothing.sensordata.dto.TagPowerMetricResponse;
+import live.smoothing.sensordata.exception.NotFoundServletException;
 import live.smoothing.sensordata.service.WattService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -18,17 +18,16 @@ public class WattController {
     private final WattService wattService;
 
     @GetMapping
-    public TagPowerMetricResponse getWattData (@RequestParam String type,
-                                               @RequestParam String unit,
+    public TagPowerMetricResponse getWattData (@RequestParam String unit,
                                                @RequestParam String per,
                                                @RequestParam String tags) {
 
         if ("min".equals(unit) && Integer.parseInt(per) == 10) {
-            return wattService.get10MinuteWattData(type, unit, per, tags);
+            return wattService.get10MinuteWattData(tags);
         } else if ("hour".equals(unit) && Integer.parseInt(per) == 1) {
-            return wattService.get1HourWattData(type, unit, per, tags);
+            return wattService.get1HourWattData(tags);
         }
 
-        throw new CommonException(HttpStatus.NOT_FOUND, "");
+        throw new NotFoundServletException(HttpStatus.NOT_FOUND, "요청을 처리할 수 없습니다.");
     }
 }
