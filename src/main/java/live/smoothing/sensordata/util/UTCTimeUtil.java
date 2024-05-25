@@ -9,19 +9,9 @@ import java.time.temporal.TemporalAdjusters;
  *
  * @author 박영준
  */
-public class TimeUtil {
+public class UTCTimeUtil {
 
-    private TimeUtil() {}
-
-    /**
-     * 가장 최근 시간을 반환한다.
-     *
-     * @param source 기준 시간
-     * @return 시간
-     */
-    public static Instant getRecentHour(Instant source) {
-        return source.truncatedTo(ChronoUnit.HOURS);
-    }
+    private UTCTimeUtil() {}
 
     /**
      * 단위 기준 최근 분을 반환한다.
@@ -39,15 +29,13 @@ public class TimeUtil {
     }
 
     /**
-     * 가장 최근 월을 반환한다.
+     * 가장 최근 시간을 반환한다.
      *
      * @param source 기준 시간
      * @return 시간
      */
-    public static Instant getRecentMonth(Instant source) {
-        return ZonedDateTime.ofInstant(source, ZoneId.systemDefault())
-                .with(TemporalAdjusters.firstDayOfMonth())
-                .truncatedTo(ChronoUnit.DAYS).toInstant();
+    public static Instant getRecentHour(Instant source) {
+        return source.truncatedTo(ChronoUnit.HOURS);
     }
 
     /**
@@ -61,5 +49,17 @@ public class TimeUtil {
                 .plus(9L, ChronoUnit.HOURS)
                 .truncatedTo(ChronoUnit.DAYS)
                 .minus(9L, ChronoUnit.HOURS);
+    }
+
+    /**
+     * 가장 최근 월을 반환한다.
+     *
+     * @param source 기준 시간
+     * @return 시간
+     */
+    public static Instant getRecentMonth(Instant source) {
+        return ZonedDateTime.ofInstant(source, ZoneId.systemDefault())
+                .with(TemporalAdjusters.firstDayOfMonth())
+                .truncatedTo(ChronoUnit.DAYS).toInstant();
     }
 }
