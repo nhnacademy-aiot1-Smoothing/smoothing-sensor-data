@@ -18,7 +18,6 @@ public class ThreePhaseController {
 
     @GetMapping
     public PhaseResponse getThreePhaseData() {
-//        log.error(threePhaseService.getThreePhase().getFirst().getTop().getValue().toString());
         return threePhaseService.getThreePhase();
     }
 }
