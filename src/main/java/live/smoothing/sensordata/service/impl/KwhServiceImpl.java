@@ -297,12 +297,9 @@ public class KwhServiceImpl implements KwhService {
         for (Map.Entry<String, List<Point>> entry : sensorNameKwhMap.entrySet()) {
             List<Point> kwhList = entry.getValue();
 
-            List<Map.Entry<Instant, Double>> collect = processTimeSeriesData(
-                    kwhList,
-                    start,
-                    end,
-                    ChronoUnit.DAYS
-            );
+            List<Point> deduplicationList = getDeduplicationList(kwhList);
+            Map<Instant, Double> sumByTimezone = getSumByTimezone(deduplicationList);
+            List<Map.Entry<Instant, Double>> collect = getSortedByTimeList(sumByTimezone);
             List<PowerMetric> powerMetrics = getKwhPowerMetricsByList(collect, TOPIC_TYPE_NAME, "1", "day");
             sensorPowerMetrics.add(new SensorPowerMetric(entry.getKey(), powerMetrics));
         }
