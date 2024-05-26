@@ -4,6 +4,7 @@ import live.smoothing.sensordata.dto.Igr;
 import live.smoothing.sensordata.entity.Point;
 import live.smoothing.sensordata.repository.SeriesRepository;
 import live.smoothing.sensordata.service.IgrService;
+import live.smoothing.sensordata.util.UTCTimeUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -28,7 +29,8 @@ public class IgrServiceImpl implements IgrService {
         List<Point> endData = seriesRepository.getEndData(
                 RAW_BUCKET_NAME,
                 RAW_MEASUREMENT,
-                Instant.now().minus(30, ChronoUnit.MINUTES),
+                UTCTimeUtil.getRecentMinute(Instant.now(), 10)
+                        .minus(10, ChronoUnit.MINUTES),
                 new String[]{IGR_CLASS_A}
         );
 
@@ -40,7 +42,8 @@ public class IgrServiceImpl implements IgrService {
         List<Point> endData = seriesRepository.getEndData(
                 RAW_BUCKET_NAME,
                 RAW_MEASUREMENT,
-                Instant.now().minus(30, ChronoUnit.MINUTES),
+                UTCTimeUtil.getRecentMinute(Instant.now(), 10)
+                        .minus(10, ChronoUnit.MINUTES),
                 new String[]{IGR_OFFICE_A}
         );
 

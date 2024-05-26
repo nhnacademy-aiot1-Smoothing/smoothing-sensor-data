@@ -62,7 +62,7 @@ class PowerMetricUtilsTest {
         List<Point> result = PowerMetricUtils.getDeduplicationList(timeValueList);
 
         // then
-        assertThat(result.get(0).getValue()).isEqualTo(1.0);
+        assertThat(result.get(0).getValue()).isEqualTo(4.0);
     }
 
     @Test

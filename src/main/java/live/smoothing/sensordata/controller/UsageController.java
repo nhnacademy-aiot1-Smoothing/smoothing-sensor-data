@@ -2,7 +2,7 @@ package live.smoothing.sensordata.controller;
 
 import live.smoothing.sensordata.dto.usage.EnergyUsageResponse;
 import live.smoothing.sensordata.service.UsageService;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -13,15 +13,10 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/sensor/external/usage")
+@RequiredArgsConstructor
 public class UsageController {
 
     private final UsageService usageService;
-
-    @Autowired
-    public UsageController(UsageService usageService) {
-
-        this.usageService = usageService;
-    }
 
     @GetMapping
     public ResponseEntity<EnergyUsageResponse> getEnergyUsage(

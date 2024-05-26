@@ -72,7 +72,7 @@ class KwhServiceImplTest {
         ReflectionTestUtils.setField(point, "topic", "topic" + 48);
         raw.add(point);
 
-        when(seriesRepository.getDataByPeriod(anyString(), anyString(), any(), any(), any())).thenReturn(aggregation);
+        when(seriesRepository.getDataFromStart(anyString(), anyString(), any(), any())).thenReturn(aggregation);
         when(seriesRepository.getEndData(anyString(), anyString(), any(), any())).thenReturn(raw);
         when(topicAdapter.getTopicAll(anyString())).thenReturn(topicResponse);
 
@@ -80,7 +80,7 @@ class KwhServiceImplTest {
         TagPowerMetricResponse response = kwhService.get48HourData("");
 
         // then
-        verify(seriesRepository, times(1)).getDataByPeriod(anyString(), anyString(), any(), any(), any());
+        verify(seriesRepository, times(1)).getDataFromStart(anyString(), anyString(), any(), any());
         verify(seriesRepository, times(1)).getEndData(anyString(), anyString(), any(), any());
         verify(topicAdapter, times(1)).getTopicAll(anyString());
 
@@ -116,7 +116,7 @@ class KwhServiceImplTest {
         ReflectionTestUtils.setField(point, "topic", "topic" + 14);
         raw.add(point);
 
-        when(seriesRepository.getDataByPeriod(anyString(), anyString(), any(), any(), any())).thenReturn(aggregation);
+        when(seriesRepository.getDataFromStart(anyString(), anyString(), any(), any())).thenReturn(aggregation);
         when(seriesRepository.getEndData(anyString(), anyString(), any(), any())).thenReturn(raw);
         when(topicAdapter.getTopicWithTags(anyString(), anyString(), any())).thenReturn(topicResponse);
 
@@ -124,7 +124,7 @@ class KwhServiceImplTest {
         TagPowerMetricResponse response = kwhService.get2WeekData("tag");
 
         // then
-        verify(seriesRepository, times(1)).getDataByPeriod(anyString(), anyString(), any(), any(), any());
+        verify(seriesRepository, times(1)).getDataFromStart(anyString(), anyString(), any(), any());
         verify(seriesRepository, times(1)).getEndData(anyString(), anyString(), any(), any());
         verify(topicAdapter, times(1)).getTopicWithTags(anyString(), anyString(), any());
 
@@ -190,14 +190,14 @@ class KwhServiceImplTest {
             time = time.plus(1, ChronoUnit.HOURS);
         }
 
-        when(seriesRepository.getDataByPeriod(anyString(), anyString(), any(), any(), any())).thenReturn(aggregation);
+        when(seriesRepository.getDataFromStart(anyString(), anyString(), any(), any())).thenReturn(aggregation);
         when(topicAdapter.getTopicAll(anyString())).thenReturn(topicResponse);
 
         // when
         TimeZoneResponse timeZoneResponse = kwhService.getWeeklyDataByTimeOfDay();
 
         // then
-        verify(seriesRepository, times(1)).getDataByPeriod(anyString(), anyString(), any(), any(), any());
+        verify(seriesRepository, times(1)).getDataFromStart(anyString(), anyString(), any(), any());
         verify(topicAdapter, times(1)).getTopicAll(anyString());
 
         assertAll(

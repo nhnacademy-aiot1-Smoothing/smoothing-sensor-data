@@ -6,6 +6,7 @@ import live.smoothing.sensordata.dto.phase.ThreePhase;
 import live.smoothing.sensordata.entity.Point;
 import live.smoothing.sensordata.repository.SeriesRepository;
 import live.smoothing.sensordata.service.ThreePhaseService;
+import live.smoothing.sensordata.util.UTCTimeUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -34,7 +35,8 @@ public class ThreePhaseServiceImpl implements ThreePhaseService {
         List<Point> voltageData = seriesRepository.getEndData(
                 RAW_BUCKET_NAME,
                 RAW_MEASUREMENT,
-                Instant.now().minus(30, ChronoUnit.MINUTES),
+                UTCTimeUtil.getRecentMinute(Instant.now(), 10)
+                        .minus(10, ChronoUnit.MINUTES),
                 new String[]{CLASS_LL, CLASS_LN, OFFICE_LL, OFFICE_LN}
         );
 

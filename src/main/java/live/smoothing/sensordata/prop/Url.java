@@ -1,8 +1,5 @@
 package live.smoothing.sensordata.prop;
 
-import lombok.Getter;
-
-@Getter
 public class Url {
 
     private final String baseUrl;

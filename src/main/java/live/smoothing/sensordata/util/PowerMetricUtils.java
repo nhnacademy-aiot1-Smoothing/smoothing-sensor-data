@@ -17,7 +17,7 @@ public class PowerMetricUtils {
                 .collect(Collectors.toMap(
                         value -> value.getTime().toString() + value.getTopic(),
                         value -> value,
-                        (existing, replacement) -> existing.getValue() < replacement.getValue() ? existing : replacement
+                        (existing, replacement) -> existing.getValue() > replacement.getValue() ? existing : replacement
                 ));
 
         return List.copyOf(uniqueValues.values());

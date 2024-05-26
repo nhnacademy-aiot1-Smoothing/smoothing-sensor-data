@@ -61,18 +61,17 @@ public class KwhServiceImpl implements KwhService {
                 .plus(1, ChronoUnit.HOURS);
         Instant end = UTCTimeUtil.getRecentHour(Instant.now());
 
-        List<Point> aggregateData = seriesRepository.getDataByPeriod(
+        List<Point> aggregateData = seriesRepository.getDataFromStart(
                 AGGREGATION_BUCKET_NAME,
                 KWH_HOUR_MEASUREMENT,
                 start,
-                end.plus(30, ChronoUnit.MINUTES),
                 topics
         );
 
         List<Point> rawData = seriesRepository.getEndData(
                 RAW_BUCKET_NAME,
                 RAW_MEASUREMENT,
-                Instant.now().minus(20, ChronoUnit.MINUTES),
+                start,
                 topics
         );
 
@@ -108,18 +107,17 @@ public class KwhServiceImpl implements KwhService {
         Instant end = UTCTimeUtil.getRecentDay(Instant.now())
                 .plus(1, ChronoUnit.DAYS);
 
-        List<Point> aggregateData = seriesRepository.getDataByPeriod(
+        List<Point> aggregateData = seriesRepository.getDataFromStart(
                 AGGREGATION_BUCKET_NAME,
                 KWH_DAILY_MEASUREMENT,
                 start,
-                end.plus(30, ChronoUnit.MINUTES),
                 topics
         );
 
         List<Point> rawData = seriesRepository.getEndData(
                 RAW_BUCKET_NAME,
                 RAW_MEASUREMENT,
-                Instant.now().minus(20, ChronoUnit.MINUTES),
+                start,
                 topics
         );
 
@@ -164,7 +162,7 @@ public class KwhServiceImpl implements KwhService {
         List<Point> endDataList = seriesRepository.getEndData(
                 RAW_BUCKET_NAME,
                 RAW_MEASUREMENT,
-                endTime,
+                startTime,
                 topics
         );
 
@@ -200,11 +198,10 @@ public class KwhServiceImpl implements KwhService {
                 .minus(7, ChronoUnit.DAYS);
         Instant lastTime = UTCTimeUtil.getRecentDay(Instant.now());
 
-        List<Point> weekDataByHour = seriesRepository.getDataByPeriod(
+        List<Point> weekDataByHour = seriesRepository.getDataFromStart(
                 AGGREGATION_BUCKET_NAME,
                 KWH_HOUR_MEASUREMENT,
                 startTime,
-                lastTime.plus(30, ChronoUnit.MINUTES),
                 topics
         );
 
@@ -245,7 +242,7 @@ public class KwhServiceImpl implements KwhService {
                 AGGREGATION_BUCKET_NAME,
                 KWH_DAILY_MEASUREMENT,
                 start,
-                end.plus(30, ChronoUnit.MINUTES),
+                end,
                 topics
         );
 
@@ -341,7 +338,7 @@ public class KwhServiceImpl implements KwhService {
         List<Point> endData = seriesRepository.getEndData(
                 RAW_BUCKET_NAME,
                 RAW_MEASUREMENT,
-                end,
+                start,
                 topics
         );
 
@@ -373,6 +370,7 @@ public class KwhServiceImpl implements KwhService {
         List<Point> hourlyTotalData = seriesRepository.getDataByPeriod(
                 AGGREGATION_BUCKET_NAME,
                 KWH_HOUR_MEASUREMENT,
+                //2024-04-15T10:00:00Z
                 Instant.ofEpochMilli(0),
                 Instant.now(),
                 topics
