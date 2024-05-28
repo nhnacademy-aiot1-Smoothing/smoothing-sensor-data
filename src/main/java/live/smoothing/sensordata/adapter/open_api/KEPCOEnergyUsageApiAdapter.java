@@ -1,4 +1,4 @@
-package live.smoothing.sensordata.adapter.openApi;
+package live.smoothing.sensordata.adapter.open_api;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -51,20 +51,18 @@ public class KEPCOEnergyUsageApiAdapter implements EnergyUsageApiAdapter {
             JsonNode rootNode = mapper.readTree(json);
             EnergyUsageResponse response = new EnergyUsageResponse();
 
-            //Todo: 전국 교육서비스업 데이터 추출
-            JsonNode totNode = rootNode.path(0); //totData
+            JsonNode totNode = rootNode.path(0);
             EnergyUsage wholeCountry;
             for (JsonNode node : totNode) {
-                JsonNode total = node.path(15); //전국교육서비스업
+                JsonNode total = node.path(15);
                 wholeCountry = mapper.treeToValue(total, EnergyUsage.class);
                 response.setWholeCountry(wholeCountry);
             }
 
-            //Todo: 김해시 교육서비스업 데이터 추출
-            JsonNode dataNode = rootNode.path(1);//data
+            JsonNode dataNode = rootNode.path(1);
             EnergyUsage kimCity;
             for (JsonNode node : dataNode) {
-                JsonNode kim = node.path(52);   // 김해시
+                JsonNode kim = node.path(52);
                 kimCity = mapper.treeToValue(kim, EnergyUsage.class);
                 response.setKimCity(kimCity);
             }

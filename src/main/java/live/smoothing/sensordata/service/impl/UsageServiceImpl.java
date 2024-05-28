@@ -1,6 +1,6 @@
 package live.smoothing.sensordata.service.impl;
 
-import live.smoothing.sensordata.adapter.openApi.KEPCOEnergyUsageApiAdapter;
+import live.smoothing.sensordata.adapter.open_api.KEPCOEnergyUsageApiAdapter;
 import live.smoothing.sensordata.dto.usage.EnergyUsageResponse;
 import live.smoothing.sensordata.service.UsageService;
 import org.springframework.beans.factory.annotation.Autowired;
