@@ -8,6 +8,7 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 public class ThreePhase {
+    private String place;
     private Phase top;
     private Phase bottom;
 }

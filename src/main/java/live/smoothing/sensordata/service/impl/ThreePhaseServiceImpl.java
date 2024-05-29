@@ -40,13 +40,13 @@ public class ThreePhaseServiceImpl implements ThreePhaseService {
 
         Phase classLL =  getPhase(CLASS_LL, voltageData);
         Phase classLN =  getPhase(CLASS_LN, voltageData);
-        ThreePhase classA = new ThreePhase(classLL, classLN);
+        ThreePhase classA = new ThreePhase("Class A", classLL, classLN);
 
         Phase officeLL = getPhase(OFFICE_LL, voltageData);
         Phase officeLN = getPhase(OFFICE_LN, voltageData);
-        ThreePhase office = new ThreePhase(officeLL, officeLN);
+        ThreePhase office = new ThreePhase("Office", officeLL, officeLN);
 
-        return new PhaseResponse(classA, office);
+        return new PhaseResponse(List.of(classA, office));
     }
 
     private Phase getPhase(String topic, List<Point> points) {
