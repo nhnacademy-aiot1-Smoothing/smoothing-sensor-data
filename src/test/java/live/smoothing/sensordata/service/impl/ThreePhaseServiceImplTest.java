@@ -8,7 +8,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 
@@ -16,7 +15,8 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
@@ -55,10 +55,10 @@ class ThreePhaseServiceImplTest {
 
         // then
         assertAll(
-                () -> assertEquals(1.0, threePhase.getClassA().getTop().getValue()),
-                () -> assertEquals(1.0, threePhase.getClassA().getBottom().getValue()),
-                () -> assertEquals(1.0, threePhase.getOffice().getTop().getValue()),
-                () -> assertEquals(1.0, threePhase.getOffice().getBottom().getValue())
+                () -> assertEquals(1.0, threePhase.getThreePhases().get(0).getTop().getValue()),
+                () -> assertEquals(1.0, threePhase.getThreePhases().get(0).getTop().getValue()),
+                () -> assertEquals(1.0, threePhase.getThreePhases().get(1).getTop().getValue()),
+                () -> assertEquals(1.0, threePhase.getThreePhases().get(1).getTop().getValue())
         );
     }
 
@@ -73,10 +73,10 @@ class ThreePhaseServiceImplTest {
 
         // then
         assertAll(
-                () -> assertEquals(-1.0, threePhase.getClassA().getTop().getValue()),
-                () -> assertEquals(-1.0, threePhase.getClassA().getBottom().getValue()),
-                () -> assertEquals(-1.0, threePhase.getOffice().getTop().getValue()),
-                () -> assertEquals(-1.0, threePhase.getOffice().getBottom().getValue())
+                () -> assertEquals(-1.0, threePhase.getThreePhases().get(0).getTop().getValue()),
+                () -> assertEquals(-1.0, threePhase.getThreePhases().get(0).getTop().getValue()),
+                () -> assertEquals(-1.0, threePhase.getThreePhases().get(1).getTop().getValue()),
+                () -> assertEquals(-1.0, threePhase.getThreePhases().get(1).getTop().getValue())
         );
     }
 }

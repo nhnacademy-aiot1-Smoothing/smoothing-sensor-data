@@ -12,6 +12,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.time.Instant;
+import java.util.List;
 
 import static org.mockito.BDDMockito.given;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -32,13 +33,17 @@ class ThreePhaseControllerTest {
     void getThreePhaseData() throws Exception {
         // given
         PhaseResponse response = new PhaseResponse(
-                new ThreePhase(
-                        new Phase(Instant.now(), 1.0),
-                        new Phase(Instant.now(), 2.0)
-                ),
-                new ThreePhase(
-                        new Phase(Instant.now(), 3.0),
-                        new Phase(Instant.now(), 4.0)
+                List.of(
+                        new ThreePhase(
+                                "Class A",
+                                new Phase(Instant.now(), 1.0),
+                                new Phase(Instant.now(), 2.0)
+                        ),
+                        new ThreePhase(
+                                "Office",
+                                new Phase(Instant.now(), 3.0),
+                                new Phase(Instant.now(), 4.0)
+                        )
                 )
         );
         given(threePhaseService.getThreePhase()).willReturn(response);
@@ -49,9 +54,9 @@ class ThreePhaseControllerTest {
                         .header("X-USER-ID", "test")
                 )
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.classA.top.value").value(1.0))
-                .andExpect(jsonPath("$.classA.bottom.value").value(2.0))
-                .andExpect(jsonPath("$.office.top.value").value(3.0))
-                .andExpect(jsonPath("$.office.bottom.value").value(4.0));
+                .andExpect(jsonPath("$.threePhases[0].top.value").value(1.0))
+                .andExpect(jsonPath("$.threePhases[0].bottom.value").value(2.0))
+                .andExpect(jsonPath("$.threePhases[1].top.value").value(3.0))
+                .andExpect(jsonPath("$.threePhases[1].bottom.value").value(4.0));
     }
 }
