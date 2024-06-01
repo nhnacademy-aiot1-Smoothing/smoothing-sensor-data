@@ -1,0 +1,9 @@
+### 목표 생성
+POST http://localhost:8009/api/sensor/goals
+X-USER-ID: haha
+Content-Type: application/json
+
+{
+  "goalAmount": 6000,
+  "unitPrice": 1500
+}

@@ -1,0 +1,10 @@
+# 누수 CLASS
+GET http://localhost:8009/api/sensor/igr/class
+X-USER-ID: haha
+###
+
+
+// 누수 OFFICE
+GET http://localhost:8009/api/sensor/igr/office
+X-USER-ID: haha
+###

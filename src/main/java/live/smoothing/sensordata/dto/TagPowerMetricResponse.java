@@ -12,7 +12,7 @@ import java.util.List;
  */
 @Getter
 @AllArgsConstructor
-public class PowerMetricResponse {
+public class TagPowerMetricResponse {
 
     private List<String> tags;
     private List<PowerMetric> data;

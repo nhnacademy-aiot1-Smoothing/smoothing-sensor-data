@@ -1,11 +1,9 @@
 package live.smoothing.sensordata.dto;
 
-import lombok.Builder;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 import java.time.Instant;
-import java.time.LocalDateTime;
 
 /**
  * 전력 관련 DTO
@@ -19,7 +17,6 @@ import java.time.LocalDateTime;
  * @author 박영준
  */
 @Getter
-@Builder
 @RequiredArgsConstructor
 public class PowerMetric {
 
