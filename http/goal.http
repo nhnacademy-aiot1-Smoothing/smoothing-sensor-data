@@ -1,9 +1,9 @@
 ### 목표 생성
-POST http://localhost:8009/api/sensor/goals
+PUT http://localhost:8009/api/sensor/goals
 X-USER-ID: haha
 Content-Type: application/json
 
 {
-  "goalAmount": 6000,
+  "goalAmount": 400,
   "unitPrice": 1500
 }
