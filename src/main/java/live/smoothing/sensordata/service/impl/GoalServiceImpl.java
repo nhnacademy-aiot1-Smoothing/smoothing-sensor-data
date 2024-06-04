@@ -12,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -26,6 +27,7 @@ import java.util.stream.Collectors;
 public class GoalServiceImpl implements GoalService {
 
     private static final String NOT_FOUND_GOAL_MESSAGE = "해당 목표가 존재하지 않습니다.";
+    private static final Integer DEFAULT_UNIT_PRICE = 1500;
 
     private final GoalRepository goalRepository;
     private final TimeProvider timeProvider;
@@ -66,10 +68,14 @@ public class GoalServiceImpl implements GoalService {
     public void modifyGoal(GoalRequest goalRequest) {
         LocalDateTime now = timeProvider.now();
         Goal goal = goalRepository.findByYearAndMonth(now.getYear(), now.getMonthValue())
-                .orElseThrow(() -> new NotFoundGoalException(HttpStatus.NOT_FOUND, NOT_FOUND_GOAL_MESSAGE));
+                .orElse(Goal.builder().goalDate(LocalDateTime.of(LocalDate.now().getYear(), LocalDate.now().getMonth(), 1, 0, 0)).build());
 
         goal.setGoalAmount(goalRequest.getGoalAmount());
-        goal.setUnitPrice(goalRequest.getUnitPrice());
+        if (goalRequest.getUnitPrice() != null) {
+            goal.setUnitPrice(goalRequest.getUnitPrice());
+        } else {
+            goal.setUnitPrice(DEFAULT_UNIT_PRICE);
+        }
 
         goalRepository.save(goal);
     }

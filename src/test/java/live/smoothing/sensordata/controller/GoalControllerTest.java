@@ -80,27 +80,28 @@ class GoalControllerTest {
         then(goalService).should(times(1)).modifyGoal(any());
     }
 
-    @Test
-    @DisplayName("해당 연월의 목표가 존재하지 않으면 404 NOT FOUND 응답을 반환한다.")
-    void modifyGoal_throws_NotFoundGoalException() throws Exception {
-        // given
-        doThrow(new NotFoundGoalException(HttpStatus.NOT_FOUND, "")).when(goalService).modifyGoal(any());
-
-        GoalRequest goalRequest = new GoalRequest();
-        ReflectionTestUtils.setField(goalRequest, "goalAmount", 0.0);
-        ReflectionTestUtils.setField(goalRequest, "unitPrice", 0);
-
-        // when
-        // then
-        mockMvc.perform(put("/api/sensor/goals")
-                        .contentType("application/json")
-                        .content(objectMapper.writeValueAsString(goalRequest))
-                        .header("X-USER-ID", "test-user")
-                )
-                .andExpect(status().isNotFound());
-
-        then(goalService).should(times(1)).modifyGoal(any());
-    }
+    //not found 없애서 원래 테스트 주석처리 했슴다
+//    @Test
+//    @DisplayName("해당 연월의 목표가 존재하지 않으면 404 NOT FOUND 응답을 반환한다.")
+//    void modifyGoal_throws_NotFoundGoalException() throws Exception {
+//        // given
+//        doThrow(new NotFoundGoalException(HttpStatus.NOT_FOUND, "")).when(goalService).modifyGoal(any());
+//
+//        GoalRequest goalRequest = new GoalRequest();
+//        ReflectionTestUtils.setField(goalRequest, "goalAmount", 0.0);
+//        ReflectionTestUtils.setField(goalRequest, "unitPrice", 0);
+//
+//        // when
+//        // then
+//        mockMvc.perform(put("/api/sensor/goals")
+//                        .contentType("application/json")
+//                        .content(objectMapper.writeValueAsString(goalRequest))
+//                        .header("X-USER-ID", "test-user")
+//                )
+//                .andExpect(status().isNotFound());
+//
+//        then(goalService).should(times(1)).modifyGoal(any());
+//    }
 
     @Test
     @DisplayName("목표 이력을 가져올 때 적절한 응답이 반환된다.")

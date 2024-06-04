@@ -138,22 +138,23 @@ class GoalServiceImplTest {
         assertThat(goal.getUnitPrice()).isEqualTo(200);
     }
 
-    @Test
-    @DisplayName("목표를 수정할 때 해당 목표가 존재하지 않는다면 NotFoundGoalException 발생")
-    void modifyGoal_throws_NotFoundGoalException() {
-        // when
-        when(goalRepository.findByYearAndMonth(anyInt(), anyInt())).thenReturn(Optional.empty());
-        GoalRequest goalRequest = new GoalRequest();
-        ReflectionTestUtils.setField(goalRequest, "goalAmount", 0.0);
-        ReflectionTestUtils.setField(goalRequest, "unitPrice", 0);
-
-        // when
-        NotFoundGoalException exception = assertThrows(NotFoundGoalException.class, () -> goalService.modifyGoal(goalRequest));
-
-        // then
-        verify(goalRepository, times(1)).findByYearAndMonth(anyInt(), anyInt());
-        verify(goalRepository, never()).save(any());
-
-        assertThat(exception.getStatus()).isEqualTo(HttpStatus.NOT_FOUND);
-    }
+    //not found 없애서 원래 테스트 주석처리 했슴다
+//    @Test
+//    @DisplayName("목표를 수정할 때 해당 목표가 존재하지 않는다면 NotFoundGoalException 발생")
+//    void modifyGoal_throws_NotFoundGoalException() {
+//        // when
+//        when(goalRepository.findByYearAndMonth(anyInt(), anyInt())).thenReturn(Optional.empty());
+//        GoalRequest goalRequest = new GoalRequest();
+//        ReflectionTestUtils.setField(goalRequest, "goalAmount", 0.0);
+//        ReflectionTestUtils.setField(goalRequest, "unitPrice", 0);
+//
+//        // when
+//        NotFoundGoalException exception = assertThrows(NotFoundGoalException.class, () -> goalService.modifyGoal(goalRequest));
+//
+//        // then
+//        verify(goalRepository, times(1)).findByYearAndMonth(anyInt(), anyInt());
+//        verify(goalRepository, never()).save(any());
+//
+//        assertThat(exception.getStatus()).isEqualTo(HttpStatus.NOT_FOUND);
+//    }
 }
