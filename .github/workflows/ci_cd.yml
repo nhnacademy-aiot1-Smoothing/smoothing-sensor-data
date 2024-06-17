@@ -41,9 +41,9 @@ jobs:
     - name: execute shell script
       uses: appleboy/ssh-action@master
       with:
-        host: ${{ secrets.SSH_IP_1 }}
+        host: ${{ secrets.SSH_IP }}
         username: ${{ secrets.SSH_ID }}
-        key: ${{ secrets.SSH_KEY_1 }}
+        key: ${{ secrets.SSH_KEY }}
         port: ${{ secrets.SSH_PORT }}
         script: |
           sudo docker build -t sensor-data:latest ./ --build-arg FILE=target/sensor-data-0.0.1-SNAPSHOT.jar
