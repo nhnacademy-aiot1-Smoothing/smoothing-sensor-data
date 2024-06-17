@@ -22,7 +22,6 @@ public class Goal {
     @Column(name = "goal_date")
     private LocalDateTime goalDate;
 
-
     @Column(name = "goal_amount")
     private Double goalAmount;
 
