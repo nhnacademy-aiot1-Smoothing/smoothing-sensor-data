@@ -19,15 +19,17 @@ jobs:
         cache: maven
         
 # CI        
-    # - name: Build with Maven
-    #   run: mvn -B package --file pom.xml
+    - name: Build with Maven
+      run: mvn -B package --file pom.xml
 
 # SonarQube
-    # - name : Run SonarQube
-    #   run : ${{ secrets.SONAR_COMMAND }}
+    - name : Run SonarQube
+      if: ${{ success() }}
+      run : ${{ secrets.SONAR_COMMAND }}
 
 # CD
     - name: upload file
+      if: ${{ success() }}
       uses: appleboy/scp-action@master
       with:
         host: ${{ secrets.SSH_IP }}
@@ -39,6 +41,7 @@ jobs:
         rm: false
 
     - name: execute shell script
+      if: ${{ success() }}
       uses: appleboy/ssh-action@master
       with:
         host: ${{ secrets.SSH_IP }}
